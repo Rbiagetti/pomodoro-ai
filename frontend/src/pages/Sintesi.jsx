@@ -3,17 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 
 function getSupportedMimeType() {
-  const types = [
-    'audio/webm;codecs=opus',
-    'audio/webm',
-    'audio/mp4',
-    'audio/ogg',
-    '',
-  ]
-  for (const type of types) {
-    if (type === '' || MediaRecorder.isTypeSupported(type)) return type
-  }
-  return ''
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  if (isIOS) return 'audio/mp4'
+  if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus'
+  if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm'
+  return 'audio/mp4'
 }
 
 function mimeToExt(mimeType) {
