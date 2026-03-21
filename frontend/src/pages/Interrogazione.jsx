@@ -9,10 +9,7 @@ export default function Interrogazione() {
   const { argomento, durata, trascrizione, analisi } = state || {}
 
   const [chat, setChat] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem('chat_history')
-      return saved ? JSON.parse(saved) : []
-    } catch { return [] }
+    try { const s = sessionStorage.getItem('chat_history'); return s ? JSON.parse(s) : [] } catch { return [] }
   })
   const [risposta, setRisposta] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,79 +25,59 @@ export default function Interrogazione() {
   const generaDomanda = async (history) => {
     setLoading(true)
     try {
-      const { data } = await API.post('/audio/question', {
-        argomento, trascrizione, analisi, chat_history: history,
-      })
-      const newHistory = [...history, { role: 'assistant', content: data.domanda }]
-      setChat(newHistory)
-      // speakText(data.domanda) — solo su richiesta
-    } catch (e) {
-      alert('Errore AI: ' + (e.response?.data?.detail || e.message))
-    } finally {
-      setLoading(false)
-    }
+      const { data } = await API.post('/audio/question', { argomento, trascrizione, analisi, chat_history: history })
+      const newH = [...history, { role: 'assistant', content: data.domanda }]
+      setChat(newH)
+      sessionStorage.setItem('chat_history', JSON.stringify(newH))
+    } catch (e) { alert('Errore AI: ' + (e.response?.data?.detail || e.message)) }
+    finally { setLoading(false) }
   }
 
   const speakText = (text) => {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
     const utt = new SpeechSynthesisUtterance(text)
-    utt.lang = 'it-IT'
-    utt.rate = 1.0
-    utt.pitch = 1.0
+    utt.lang = 'it-IT'; utt.rate = 1.0
     setAiSpeaking(true)
     utt.onend = () => setAiSpeaking(false)
     utt.onerror = () => setAiSpeaking(false)
     window.speechSynthesis.speak(utt)
   }
 
-  const stopSpeaking = () => {
-    window.speechSynthesis.cancel()
-    setAiSpeaking(false)
-  }
-
   const invia = async (testo) => {
     const t = testo || risposta
     if (!t.trim()) return
-    const newHistory = [...chat, { role: 'user', content: t }]
-    sessionStorage.setItem('chat_history', JSON.stringify(newHistory))
-    setChat(newHistory)
+    const newH = [...chat, { role: 'user', content: t }]
+    setChat(newH)
+    sessionStorage.setItem('chat_history', JSON.stringify(newH))
     setRisposta('')
-    await generaDomanda(newHistory)
+    await generaDomanda(newH)
   }
 
   const startRecording = async () => {
     try {
-      stopSpeaking()
+      window.speechSynthesis?.cancel()
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm' })
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      const mimeType = isIOS ? 'audio/mp4' : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'
+      const recorder = new MediaRecorder(stream, { mimeType })
       const chunks = []
-      recorder.ondataavailable = e => chunks.push(e.data)
+      recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data) }
       recorder.onstop = async () => {
-        const blob = new Blob(chunks)
+        const blob = new Blob(chunks, { type: mimeType })
         setLoading(true)
         try {
           const formData = new FormData()
-          formData.append('file', blob, 'risposta.mp4')
+          formData.append('file', blob, isIOS ? 'risposta.m4a' : 'risposta.webm')
           const { data } = await API.post('/audio/transcribe', formData)
           await invia(data.trascrizione)
-        } catch(e) {
-          alert('Errore trascrizione: ' + e.message)
-          setLoading(false)
-        }
+        } catch(e) { alert('Errore trascrizione: ' + e.message); setLoading(false) }
       }
-      recorder.start()
-      mediaRef.current = recorder
-      setRecording(true)
-    } catch(e) {
-      alert('Microfono non disponibile')
-    }
+      recorder.start(); mediaRef.current = recorder; setRecording(true)
+    } catch(e) { alert('Microfono non disponibile') }
   }
 
-  const stopRecording = () => {
-    mediaRef.current?.stop()
-    setRecording(false)
-  }
+  const stopRecording = () => { mediaRef.current?.stop(); setRecording(false) }
 
   const salva = async () => {
     setSaving(true)
@@ -112,13 +89,9 @@ export default function Interrogazione() {
         chat_history: chat,
       })
       sessionStorage.removeItem('chat_history')
-      endChat()
-      navigate('/')
-    } catch (e) {
-      alert('Errore salvataggio: ' + (e.response?.data?.detail || e.message))
-    } finally {
-      setSaving(false)
-    }
+      endChat(); navigate('/')
+    } catch (e) { alert('Errore: ' + (e.response?.data?.detail || e.message)) }
+    finally { setSaving(false) }
   }
 
   return (
@@ -126,9 +99,9 @@ export default function Interrogazione() {
       <div className="max-w-md w-full mx-auto flex flex-col flex-1 min-h-0">
 
         {/* Header */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
-          <h2 className="text-white font-bold text-center" style={{fontFamily:'Georgia, serif'}}>🤖 Interrogazione AI</h2>
-          <p className="text-gray-500 text-sm text-center mt-1">{argomento}</p>
+        <div className="rounded-2xl p-4 mb-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <h2 className="font-bold text-center" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", fontSize:'18px', letterSpacing:'0.5px'}}>🤖 Interrogazione AI</h2>
+          <p className="text-sm text-center mt-1" style={{color:'var(--muted)'}}>{argomento}</p>
         </div>
 
         {/* Chat */}
@@ -136,19 +109,17 @@ export default function Interrogazione() {
           {chat.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2`}>
               {msg.role === 'assistant' && (
-                <button
-                  onClick={() => speakText(msg.content)}
-                  className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs text-gray-500 hover:text-white transition flex-shrink-0"
-                  title="Ascolta"
-                >
-                  🔊
-                </button>
+                <button onClick={() => speakText(msg.content)}
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs transition flex-shrink-0"
+                  style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--muted)'}}
+                >🔊</button>
               )}
-              <div className={`max-w-xs rounded-2xl px-4 py-3 text-sm ${
-                msg.role === 'user'
-                  ? 'bg-gradient-to-br from-red-500 to-orange-500 text-white'
-                  : 'bg-white/8 border border-white/10 text-gray-200'
-              }`}>
+              <div className="max-w-xs rounded-2xl px-4 py-3 text-sm"
+                style={msg.role === 'user'
+                  ? {background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)'}
+                  : {background:'var(--surface)', border:'1px solid var(--border)', color:'var(--text2)'}
+                }
+              >
                 {msg.content}
               </div>
             </div>
@@ -156,8 +127,8 @@ export default function Interrogazione() {
 
           {loading && (
             <div className="flex justify-start items-end gap-2">
-              <div className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex-shrink-0" />
-              <div className="bg-white/5 border border-white/10 text-gray-500 rounded-2xl px-4 py-3 text-sm animate-pulse">
+              <div className="w-7 h-7 rounded-full flex-shrink-0" style={{background:'var(--surface)', border:'1px solid var(--border)'}} />
+              <div className="rounded-2xl px-4 py-3 text-sm animate-pulse" style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--muted)'}}>
                 L'AI sta pensando...
               </div>
             </div>
@@ -165,67 +136,51 @@ export default function Interrogazione() {
 
           {aiSpeaking && (
             <div className="flex justify-center">
-              <button
-                onClick={stopSpeaking}
-                className="text-xs text-blue-400 border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 rounded-full animate-pulse hover:animate-none hover:bg-blue-500/20 transition"
+              <button onClick={() => window.speechSynthesis?.cancel()}
+                className="text-xs px-3 py-1.5 rounded-full animate-pulse"
+                style={{color:'var(--accent2)', border:'1px solid rgba(240,148,58,0.3)', background:'rgba(240,148,58,0.1)'}}
               >
                 🔊 AI sta parlando... (clicca per fermare)
               </button>
             </div>
           )}
-
           <div ref={chatEndRef} />
         </div>
 
         {/* Input */}
         <div className="space-y-3">
-
-          {/* Stato registrazione */}
           {recording && (
-            <div className="flex items-center justify-center gap-2 text-red-400 text-sm animate-pulse">
-              <span className="w-2 h-2 bg-red-400 rounded-full" />
-              Sto registrando... clicca il microfono per fermare
+            <div className="flex items-center justify-center gap-2 text-sm animate-pulse" style={{color:'var(--accent1)'}}>
+              <span className="w-2 h-2 rounded-full" style={{background:'var(--accent1)'}} />
+              Sto registrando...
             </div>
           )}
 
           <div className="flex gap-2">
             <input
-              type="text"
-              placeholder="La tua risposta..."
-              value={risposta}
-              onChange={e => setRisposta(e.target.value)}
+              type="text" placeholder="La tua risposta..."
+              value={risposta} onChange={e => setRisposta(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && invia()}
               disabled={recording || loading}
-              className="flex-1 bg-white/5 border border-white/10 text-white placeholder-gray-600 rounded-xl px-4 py-3 outline-none focus:border-red-500/50 text-sm transition-all disabled:opacity-40"
+              className="flex-1 rounded-xl px-4 py-3 outline-none text-sm transition-all disabled:opacity-40"
+              style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--text)'}}
             />
-
-            {/* Tasto microfono */}
-            <button
-              onClick={recording ? stopRecording : startRecording}
-              disabled={loading}
-              className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg transition-all disabled:opacity-30 ${
-                recording
-                  ? 'bg-red-500 border border-red-400 animate-pulse'
-                  : 'bg-white/5 border border-white/10 hover:bg-white/10'
-              }`}
-            >
-              🎙️
-            </button>
-
-            {/* Tasto invia testo */}
-            <button
-              onClick={() => invia()}
-              disabled={loading || !risposta.trim() || recording}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 text-white font-bold flex items-center justify-center transition disabled:opacity-30"
-            >
-              ➤
-            </button>
+            <button onClick={recording ? stopRecording : startRecording} disabled={loading}
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-lg transition-all disabled:opacity-30"
+              style={recording
+                ? {background:'var(--accent1)', border:'none'}
+                : {background:'var(--surface)', border:'1px solid var(--border)'}
+              }
+            >🎙️</button>
+            <button onClick={() => invia()} disabled={loading || !risposta.trim() || recording}
+              className="w-12 h-12 rounded-xl font-bold flex items-center justify-center transition disabled:opacity-30"
+              style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)', border:'none'}}
+            >➤</button>
           </div>
 
-          <button
-            onClick={salva}
-            disabled={saving}
-            className="w-full py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-sm hover:bg-emerald-500/30 transition disabled:opacity-50"
+          <button onClick={salva} disabled={saving}
+            className="w-full py-3 rounded-xl font-bold text-sm transition disabled:opacity-50"
+            style={{background:'rgba(90,158,111,0.15)', border:'1px solid rgba(90,158,111,0.3)', color:'var(--success)'}}
           >
             {saving ? '💾 Salvataggio...' : '✅ Termina e salva sessione'}
           </button>

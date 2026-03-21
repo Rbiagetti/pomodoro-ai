@@ -81,10 +81,10 @@ export function useTimerState() {
 }
 
 const PHASE_STYLE = {
-  IDLE:            { label: 'Timer',     color: 'text-gray-500',    bg: 'bg-white/5',        border: 'border-white/10' },
-  POMODORO_ACTIVE: { label: '🍅 Focus',  color: 'text-red-400',     bg: 'bg-red-500/15',     border: 'border-red-500/25' },
-  CHAT_ACTIVE:     { label: '💬 Chat',   color: 'text-blue-400',    bg: 'bg-blue-500/15',    border: 'border-blue-500/25' },
-  BREAK_ACTIVE:    { label: '☕ Pausa',  color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/25' },
+  IDLE:            { label: 'Timer',     color: '#9a8878',    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,180,80,0.08)' },
+  POMODORO_ACTIVE: { label: '🍅 Focus',  color: '#ff6b3d',    bg: 'rgba(255,107,61,0.12)', border: 'rgba(255,107,61,0.25)' },
+  CHAT_ACTIVE:     { label: '💬 Chat',   color: '#c4a24a',    bg: 'rgba(196,162,74,0.12)', border: 'rgba(196,162,74,0.25)' },
+  BREAK_ACTIVE:    { label: '☕ Pausa',  color: '#5a9e6f',    bg: 'rgba(90,158,111,0.12)', border: 'rgba(90,158,111,0.25)' },
 }
 
 export default function PomodoroTimer() {
