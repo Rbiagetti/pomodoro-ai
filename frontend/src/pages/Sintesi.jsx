@@ -2,6 +2,14 @@ import { useState, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 
+function getSupportedMimeType() {
+  const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) return type
+  }
+  return ''
+}
+
 export default function Sintesi() {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -11,25 +19,46 @@ export default function Sintesi() {
   const [tab, setTab] = useState('registra')
   const [recording, setRecording] = useState(false)
   const [audioBlob, setAudioBlob] = useState(null)
+  const [audioUrl, setAudioUrl] = useState(null)
   const [uploadedFile, setUploadedFile] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   const mediaRef = useRef(null)
   const fileRef = useRef(null)
+  const chunksRef = useRef([])
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm' })
-    const chunks = []
-    recorder.ondataavailable = e => chunks.push(e.data)
-    recorder.onerror = (e) => alert("Errore recorder: " + e.error); recorder.onstop = () => setAudioBlob(new Blob(chunks))
-    recorder.start()
-    mediaRef.current = recorder
-    setRecording(true)
-    setAudioBlob(null)
+    try {
+      setError(null)
+      setAudioBlob(null)
+      setAudioUrl(null)
+      chunksRef.current = []
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mimeType = getSupportedMimeType()
+      const options = mimeType ? { mimeType } : {}
+      const recorder = new MediaRecorder(stream, options)
+      recorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) chunksRef.current.push(e.data)
+      }
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
+        const url = URL.createObjectURL(blob)
+        setAudioBlob(blob)
+        setAudioUrl(url)
+        stream.getTracks().forEach(t => t.stop())
+      }
+      recorder.start(100)
+      mediaRef.current = recorder
+      setRecording(true)
+    } catch(e) {
+      setError('Microfono non disponibile: ' + e.message)
+    }
   }
 
   const stopRecording = () => {
-    mediaRef.current?.stop()
+    if (mediaRef.current && mediaRef.current.state !== 'inactive') {
+      mediaRef.current.stop()
+    }
     setRecording(false)
   }
 
@@ -37,10 +66,11 @@ export default function Sintesi() {
     const file = tab === 'registra' ? audioBlob : uploadedFile
     if (!file) return
     setLoading(true)
+    setError(null)
     try {
       const formData = new FormData()
-      const filename = tab === 'registra' ? 'sintesi.mp4' : uploadedFile.name
-      formData.append('file', file, filename)
+      const ext = tab === 'carica' ? uploadedFile.name.split('.').pop() : 'mp4'
+      formData.append('file', file, `sintesi.${ext}`)
       const { data: trascrData } = await API.post('/audio/transcribe', formData)
       const { data: analisiData } = await API.post('/audio/analyze', {
         argomento,
@@ -50,7 +80,7 @@ export default function Sintesi() {
         state: { argomento, durata, trascrizione: trascrData.trascrizione, analisi: analisiData.analisi }
       })
     } catch (e) {
-      alert('Errore: ' + (e.response?.data?.detail || e.message))
+      setError('Errore: ' + (e.response?.data?.detail || e.message))
     } finally {
       setLoading(false)
     }
@@ -61,7 +91,6 @@ export default function Sintesi() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
-
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-white" style={{fontFamily:'Georgia, serif'}}>🎙️ Sintesi vocale</h2>
           <p className="text-gray-500 text-sm mt-2">
@@ -69,16 +98,13 @@ export default function Sintesi() {
           </p>
         </div>
 
-        {/* Tab selector */}
         <div className="flex gap-2 mb-5 bg-white/5 border border-white/10 rounded-2xl p-1">
           {['registra', 'carica'].map(t => (
             <button
               key={t}
-              onClick={() => { setTab(t); setAudioBlob(null); setUploadedFile(null) }}
+              onClick={() => { setTab(t); setAudioBlob(null); setAudioUrl(null); setUploadedFile(null) }}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                tab === t
-                  ? 'bg-white/10 text-white shadow'
-                  : 'text-gray-500 hover:text-gray-300'
+                tab === t ? 'bg-white/10 text-white shadow' : 'text-gray-500 hover:text-gray-300'
               }`}
             >
               {t === 'registra' ? '🔴 Registra' : '📁 Carica file'}
@@ -93,15 +119,11 @@ export default function Sintesi() {
               <button
                 onClick={recording ? stopRecording : startRecording}
                 className={`w-full py-5 rounded-2xl font-bold text-sm transition-all relative overflow-hidden ${
-                  recording
-                    ? 'bg-gray-800 border border-white/10 text-gray-300'
-                    : 'text-white'
+                  recording ? 'bg-gray-800 border border-white/10 text-gray-300' : 'text-white'
                 }`}
                 style={!recording ? {background:'linear-gradient(135deg,#ef4444,#f97316)'} : {}}
               >
-                {recording && (
-                  <span className="absolute inset-0 bg-red-500/10 animate-pulse rounded-2xl" />
-                )}
+                {recording && <span className="absolute inset-0 bg-red-500/10 animate-pulse rounded-2xl" />}
                 <span className="relative z-10">
                   {recording ? '⏹ Stop registrazione' : '🔴 Inizia a registrare'}
                 </span>
@@ -114,8 +136,8 @@ export default function Sintesi() {
                 </div>
               )}
 
-              {audioBlob && (
-                <audio controls src={URL.createObjectURL(audioBlob)} className="w-full rounded-xl" />
+              {audioUrl && (
+                <audio controls src={audioUrl} className="w-full rounded-xl" />
               )}
             </>
           )}
@@ -128,7 +150,6 @@ export default function Sintesi() {
               >
                 <span className="text-3xl">📁</span>
                 <span>{uploadedFile ? uploadedFile.name : 'Clicca per caricare un file MP3'}</span>
-                <span className="text-xs text-gray-600">MP3</span>
               </button>
               <input
                 ref={fileRef}
@@ -141,6 +162,12 @@ export default function Sintesi() {
                 <audio controls src={URL.createObjectURL(uploadedFile)} className="w-full rounded-xl" />
               )}
             </>
+          )}
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-xs">
+              {error}
+            </div>
           )}
 
           <button
