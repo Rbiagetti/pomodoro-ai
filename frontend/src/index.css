@@ -33,3 +33,12 @@ input[type="range"]::-moz-range-thumb {
 input, textarea, select {
   font-size: 16px !important;
 }
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}

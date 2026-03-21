@@ -133,7 +133,7 @@ export default function PomodoroTimer() {
   if (state.phase === 'CHAT_ACTIVE') {
     return (
       <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm ${style.bg} ${style.border}`}>
-        <span className={`text-xs font-medium ${style.color}`}>💬 Chat attiva</span>
+        <span className={`text-xs font-medium ${style.color}`}>💬</span>
         <button onClick={toggleSound} className="text-gray-700 hover:text-gray-400 text-xs ml-1 transition">
           {state.soundEnabled ? '🔊' : '🔇'}
         </button>
