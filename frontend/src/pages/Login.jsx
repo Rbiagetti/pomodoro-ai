@@ -33,7 +33,7 @@ export default function Login({ onLogin }) {
           <div className="inline-flex w-20 h-20 rounded-3xl items-center justify-center text-4xl mb-5 shadow-2xl" style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))'}}>
             🍅
           </div>
-          <h1 className="text-4xl font-bold mb-2" style={{color:'var(--text)', fontFamily:"'Playfair Display', serif"}}>
+          <h1 className="text-4xl font-bold mb-2" style={{color:'var(--text)', fontFamily:"'Syne', sans-serif"}}>
             Pomodoro AI
           </h1>
           <p style={{color:'var(--muted)', fontSize:'14px'}}>Studia meglio con l'AI socratica</p>
