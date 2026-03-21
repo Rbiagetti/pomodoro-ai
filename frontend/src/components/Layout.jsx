@@ -10,6 +10,7 @@ export default function Layout({ children, onLogout, user }) {
   const navItems = [
     { icon: '🍅', label: 'Studia', path: '/' },
     { icon: '📚', label: 'Sessioni', path: '/sessioni' },
+    { icon: '🛡️', label: 'Admin', path: '/admin' },
   ]
 
   return (

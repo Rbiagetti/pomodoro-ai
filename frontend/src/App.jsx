@@ -6,6 +6,7 @@ import Pomodoro from './pages/Pomodoro'
 import Sintesi from './pages/Sintesi'
 import Interrogazione from './pages/Interrogazione'
 import Sessioni from './pages/Sessioni'
+import Admin from './pages/Admin'
 import Layout from './components/Layout'
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/sintesi" element={<Sintesi />} />
           <Route path="/interrogazione" element={<Interrogazione />} />
           <Route path="/sessioni" element={<Sessioni />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout>
