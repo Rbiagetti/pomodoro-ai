@@ -124,11 +124,6 @@ pomodoro-ai/
 | tags | TEXT[] | Tag opzionali |
 | created_at | TIMESTAMP | Auto |
 
-### Tabella `admins`
-| Campo | Tipo | Note |
-|---|---|---|
-| user_id | UUID | Primary key |
-
 ---
 
 ## 🔌 API Endpoints
@@ -264,15 +259,6 @@ cd frontend && vercel --prod
 2. Aggiungi il router in `backend/routers/`
 3. Monta in `backend/main.py` se è un nuovo router
 4. Aggiungi lo schema in `backend/models.py`
-
----
-
-## 🛡️ Admin
-
-Per aggiungere un admin, esegui su Supabase SQL Editor:
-```sql
-INSERT INTO admins (user_id) VALUES ('uuid-dell-utente');
-```
 
 ---
 
