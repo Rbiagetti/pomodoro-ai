@@ -223,7 +223,8 @@ vercel --prod
 ```
 Aggiungi le 3 env variables su Vercel dashboard.
 
-> ⚠️ Il backend su Render free si addormenta dopo 15 min di inattività. La prima richiesta può richiedere ~30 secondi.
+> ✅ Il backend è sempre sveglio grazie a **UptimeRobot** che fa ping ogni 5 minuti su .
+> Configurazione: uptimerobot.com → HTTP monitor → https://pomodoro-ai-u1cn.onrender.com/ → ogni 5 min.
 
 ---
 
