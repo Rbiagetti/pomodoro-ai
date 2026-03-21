@@ -224,7 +224,7 @@ vercel --prod
 Aggiungi le 3 env variables su Vercel dashboard.
 
 > ✅ Il backend è sempre sveglio grazie a **UptimeRobot** che fa ping ogni 5 minuti su .
-> Configurazione: uptimerobot.com → HTTP monitor → https://pomodoro-ai-u1cn.onrender.com/ → ogni 5 min.
+> Configurazione: uptimerobot.com → HTTP monitor → https://pomodoro-ai-u1cn.onrender.com/health → ogni 5 min.
 
 ---
 
