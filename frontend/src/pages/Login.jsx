@@ -9,62 +9,53 @@ export default function Login({ onLogin }) {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true); setError('')
     try {
-      const endpoint = isRegister ? '/auth/register' : '/auth/login'
-      const res = await API.post(endpoint, { email, password })
+      const res = await API.post(isRegister ? '/auth/register' : '/auth/login', { email, password })
       localStorage.setItem('token', res.data.access_token)
       localStorage.setItem('user_email', res.data.email)
+      localStorage.setItem('user_id', res.data.user_id)
       onLogin(res.data)
     } catch (e) {
       setError(e.response?.data?.detail || 'Errore di connessione')
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
-
-      {/* Blobs */}
-      <div className="absolute top-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full bg-red-600/15 blur-[130px]" />
-      <div className="absolute bottom-[-15%] right-[-5%] w-[400px] h-[400px] rounded-full bg-orange-500/10 blur-[100px]" />
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{background:'var(--bg)'}}>
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[140px]" style={{background:'rgba(232,99,58,0.08)'}} />
+        <div className="absolute bottom-[-20%] right-[-5%] w-[400px] h-[400px] rounded-full blur-[120px]" style={{background:'rgba(212,135,58,0.06)'}} />
+      </div>
 
       <div className="w-full max-w-sm relative z-10">
-
-        {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex w-20 h-20 rounded-3xl bg-gradient-to-br from-red-500 via-orange-400 to-pink-500 items-center justify-center text-4xl mb-5 shadow-2xl shadow-red-500/40">
+          <div className="inline-flex w-20 h-20 rounded-3xl items-center justify-center text-4xl mb-5 shadow-2xl" style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))'}}>
             🍅
           </div>
-          <h1 className="text-4xl font-bold text-white tracking-tight" style={{fontFamily:'Georgia, serif'}}>
+          <h1 className="text-4xl font-bold mb-2" style={{color:'var(--text)', fontFamily:"'Playfair Display', serif"}}>
             Pomodoro AI
           </h1>
-          <p className="text-gray-500 text-sm mt-2">Studia meglio con l'AI socratica</p>
+          <p style={{color:'var(--muted)', fontSize:'14px'}}>Studia meglio con l'AI socratica</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-7 shadow-2xl backdrop-blur-xl space-y-4">
-
+        <div className="rounded-3xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
           <input
-            type="email"
-            placeholder="Email"
-            value={email}
+            type="email" placeholder="Email" value={email}
             onChange={e => setEmail(e.target.value)}
-            className="w-full bg-white/5 text-white placeholder-gray-600 rounded-2xl px-5 py-4 outline-none border border-white/10 focus:border-red-500/50 transition-all text-sm"
+            className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
+            style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
           />
           <input
-            type="password"
-            placeholder="Password"
-            value={password}
+            type="password" placeholder="Password" value={password}
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            className="w-full bg-white/5 text-white placeholder-gray-600 rounded-2xl px-5 py-4 outline-none border border-white/10 focus:border-red-500/50 transition-all text-sm"
+            className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
+            style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
           />
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+            <div className="rounded-2xl px-4 py-3 text-sm" style={{background:'rgba(232,99,58,0.1)', border:'1px solid rgba(232,99,58,0.2)', color:'var(--accent1)'}}>
               {error}
             </div>
           )}
@@ -72,18 +63,16 @@ export default function Login({ onLogin }) {
           <button
             onClick={handleSubmit}
             disabled={loading || !email || !password}
-            className="w-full py-4 rounded-2xl font-bold text-white text-sm tracking-wide transition-all duration-300 disabled:opacity-30 relative overflow-hidden group"
-            style={{background:'linear-gradient(135deg, #ef4444, #f97316, #ec4899)'}}
+            className="w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all disabled:opacity-30"
+            style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)'}}
           >
-            <span className="relative z-10">
-              {loading ? '...' : isRegister ? '📝 Registrati' : '🔑 Accedi'}
-            </span>
-            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            {loading ? '...' : isRegister ? '📝 Registrati' : '🔑 Accedi'}
           </button>
 
           <button
             onClick={() => { setIsRegister(!isRegister); setError('') }}
-            className="w-full text-gray-600 hover:text-gray-400 text-xs transition py-1"
+            className="w-full py-1 text-xs transition"
+            style={{color:'var(--muted)'}}
           >
             {isRegister ? 'Hai già un account? Accedi →' : 'Non hai un account? Registrati →'}
           </button>

@@ -1,44 +1,53 @@
 @import "tailwindcss";
 
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 9999px;
-  outline: none;
-  border: none;
-}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap');
 
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  box-shadow: 0 0 6px rgba(0,0,0,0.4);
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  border: none;
-}
-
-/* Fix zoom Safari iOS su input focus */
-input, textarea, select {
-  font-size: 16px !important;
+:root {
+  --bg:        #0c0a08;
+  --surface:   #141210;
+  --surface2:  #1c1916;
+  --border:    rgba(255,180,80,0.08);
+  --border2:   rgba(255,180,80,0.15);
+  --accent1:   #e8633a;
+  --accent2:   #d4873a;
+  --accent3:   #c4a24a;
+  --success:   #5a9e6f;
+  --muted:     #6b5e50;
+  --text:      #f0e8df;
+  --text2:     #a8998a;
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
 
 body {
+  background: var(--bg);
+  color: var(--text);
   font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 16px;
+}
+
+input, textarea, select, button {
+  font-size: 16px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  outline: none;
+  border: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent1);
+  cursor: pointer;
 }
