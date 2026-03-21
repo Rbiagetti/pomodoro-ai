@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import PomodoroTimer from './PomodoroTimer'
+import HowItWorks from './HowItWorks'
 
 export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -79,6 +80,7 @@ export default function Layout({ children, onLogout, user }) {
         <PomodoroTimer />
       </div>
 
+      <HowItWorks />
       <div className="pt-16 relative z-10">
         {children}
       </div>
