@@ -122,8 +122,8 @@ export default function Interrogazione() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4">
-      <div className="max-w-md w-full mx-auto flex flex-col flex-1">
+    <div className="h-screen flex flex-col p-4 overflow-hidden">
+      <div className="max-w-md w-full mx-auto flex flex-col flex-1 min-h-0">
 
         {/* Header */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
