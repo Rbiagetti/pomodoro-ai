@@ -6,8 +6,8 @@ import Pomodoro from './pages/Pomodoro'
 import Sintesi from './pages/Sintesi'
 import Interrogazione from './pages/Interrogazione'
 import Sessioni from './pages/Sessioni'
-import Layout from './components/Layout'
 import Error from './pages/Error'
+import Layout from './components/Layout'
 import ErrorBoundary from './components/ErrorBoundary'
 
 export default function App() {
@@ -25,19 +25,19 @@ export default function App() {
   if (!user) return <Login onLogin={handleLogin} />
 
   return (
-    <ErrorBoundary>
     <BrowserRouter>
-      <Layout onLogout={handleLogout} user={user}>
-        <Routes>
-          <Route path="/" element={<Timer />} />
-          <Route path="/pomodoro" element={<Pomodoro />} />
-          <Route path="/sintesi" element={<Sintesi />} />
-          <Route path="/interrogazione" element={<Interrogazione />} />
-          <Route path="/sessioni" element={<Sessioni />} />
-          <Route path="*" element={<Error message="Pagina non trovata" />} />
-        </Routes>
-      </Layout>
+      <ErrorBoundary>
+        <Layout onLogout={handleLogout} user={user}>
+          <Routes>
+            <Route path="/" element={<Timer />} />
+            <Route path="/pomodoro" element={<Pomodoro />} />
+            <Route path="/sintesi" element={<Sintesi />} />
+            <Route path="/interrogazione" element={<Interrogazione />} />
+            <Route path="/sessioni" element={<Sessioni />} />
+            <Route path="*" element={<Error message="Pagina non trovata 🍅" />} />
+          </Routes>
+        </Layout>
+      </ErrorBoundary>
     </BrowserRouter>
-  </ErrorBoundary>
   )
 }
