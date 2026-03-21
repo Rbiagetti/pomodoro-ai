@@ -13,7 +13,7 @@ async def transcribe(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
 ):
-    allowed = {"audio/wav", "audio/mpeg", "audio/mp4", "audio/ogg", "audio/webm"}
+    allowed = {"audio/wav", "audio/mpeg", "audio/mp4", "audio/ogg", "audio/webm", "audio/x-m4a", "video/mp4", "application/octet-stream"}
     if file.content_type not in allowed:
         raise HTTPException(status_code=400, detail=f"Formato non supportato: {file.content_type}")
     audio_bytes = await file.read()
