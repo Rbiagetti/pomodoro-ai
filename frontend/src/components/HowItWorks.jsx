@@ -1,41 +1,11 @@
 import { useState } from 'react'
 
 const steps = [
-  {
-    icon: '🍅',
-    title: 'Avvia il Pomodoro',
-    desc: '25 min di focus puro. Il telefono può aspettare! 📵',
-    color: '#ef4444',
-    detail: 'Francesco Cirillo nel 1987 scoprì che lavorare a "blocchi" di tempo aumenta la produttività. Il segreto? Il cervello ama i confini chiari. Dai un limite al tempo e la concentrazione esplode! 🔥'
-  },
-  {
-    icon: '🎙️',
-    title: 'Spiega a voce',
-    desc: 'Racconta tutto come se lo spiegassi a un amico. 🗣️',
-    color: '#f97316',
-    detail: 'Richard Feynman, premio Nobel per la fisica, aveva un segreto: se non riesci a spiegarlo in parole semplici, non lo hai capito davvero. Parla, e scoprirai cosa sai — e cosa no! 🧠'
-  },
-  {
-    icon: '🧠',
-    title: 'Analisi AI',
-    desc: "L'AI trova i buchi che non sapevi di avere. 🕵️",
-    color: '#eab308',
-    detail: "Whisper trascrive ogni parola, LLaMA 70B analizza il contenuto. Come un tutor invisibile che ha letto tutto il tuo libro di testo — e sa esattamente dove ti sei perso! 📚"
-  },
-  {
-    icon: '🤖',
-    title: 'Interrogazione socratica',
-    desc: "Domande scomode che ti fanno crescere. 😈",
-    color: '#3b82f6',
-    detail: 'Socrate non dava mai risposte — faceva domande. Il suo metodo, 2500 anni dopo, è ancora il modo più potente per imparare davvero. L\'AI segue le sue orme: niente spiegazioni, solo domande! 🏛️'
-  },
-  {
-    icon: '☕',
-    title: 'Pausa meritata',
-    desc: 'Hai finito! Il cervello ora consolida tutto. 🎉',
-    color: '#10b981',
-    detail: 'La scienza conferma: durante il riposo il cervello "salva" i ricordi nella memoria a lungo termine. La pausa non è pigrizia — è parte del processo! Stai ancora imparando mentre bevi il caffè ☕'
-  },
+  { icon: '🍅', title: 'Avvia il Pomodoro', desc: '25 min di focus puro. Il telefono può aspettare! 📵', color: '#ef4444', detail: 'Francesco Cirillo nel 1987 scoprì che lavorare a "blocchi" di tempo aumenta la produttività. Dai un limite al tempo e la concentrazione esplode! 🔥' },
+  { icon: '🎙️', title: 'Spiega a voce', desc: 'Racconta tutto come se lo spiegassi a un amico. 🗣️', color: '#f97316', detail: 'Richard Feynman, premio Nobel per la fisica: se non riesci a spiegarlo in parole semplici, non lo hai capito davvero. Parla, e scoprirai cosa sai — e cosa no! 🧠' },
+  { icon: '🧠', title: 'Analisi AI', desc: "L'AI trova i buchi che non sapevi di avere. 🕵️", color: '#eab308', detail: "Whisper trascrive ogni parola, LLaMA 70B analizza il contenuto. Come un tutor invisibile che sa esattamente dove ti sei perso! 📚" },
+  { icon: '🤖', title: 'Interrogazione socratica', desc: 'Domande scomode che ti fanno crescere. 😈', color: '#3b82f6', detail: "Socrate non dava mai risposte — faceva domande. 2500 anni dopo, è ancora il modo più potente per imparare davvero. L'AI segue le sue orme! 🏛️" },
+  { icon: '☕', title: 'Pausa meritata', desc: 'Hai finito! Il cervello ora consolida tutto. 🎉', color: '#10b981', detail: 'La scienza conferma: durante il riposo il cervello salva i ricordi nella memoria a lungo termine. Stai ancora imparando mentre bevi il caffè ☕' },
 ]
 
 const tech = [
@@ -60,7 +30,7 @@ export default function HowItWorks() {
             <span className="text-sm">✨</span>
             <span className="text-white text-xs font-medium">Come funziona?</span>
             <button onClick={() => setShowBubble(false)} className="text-gray-600 hover:text-gray-400 text-xs ml-1">✕</button>
-            <div className="absolute bottom-[-6px] right-4 w-3 h-3 bg-[#1a1a2e] border-r border-b border-white/10 rotate-45" />
+            <div className="absolute bottom-[-6px] right-2 w-3 h-3 bg-[#1a1a2e] border-r border-b border-white/10 rotate-45" />
           </div>
         )}
         <button
@@ -79,16 +49,12 @@ export default function HowItWorks() {
       <div className={`fixed top-0 right-0 h-full w-80 z-50 transform transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="h-full bg-[#0d0d1a]/98 backdrop-blur-xl border-l border-white/8 flex flex-col">
 
-          <div className="p-5 border-b border-white/5 flex items-center justify-between">
-            <div>
-              <h3 className="text-white font-bold" style={{fontFamily:'Georgia, serif'}}>Come funziona ✨</h3>
-              <p className="text-gray-500 text-xs mt-0.5">Feynman + Socrate + AI = 🔥</p>
-            </div>
-            
+          <div className="p-5 border-b border-white/5">
+            <h3 className="text-white font-bold" style={{fontFamily:'Georgia, serif'}}>Come funziona ✨</h3>
+            <p className="text-gray-500 text-xs mt-0.5">Feynman + Socrate + AI = 🔥</p>
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
-
             <div className="space-y-1">
               {steps.map((step, i) => (
                 <button
@@ -136,16 +102,17 @@ export default function HowItWorks() {
 
             <div className="p-4 rounded-2xl bg-gradient-to-br from-red-500/10 to-orange-500/10 border border-red-500/15 text-center">
               <p className="text-white text-sm font-semibold" style={{fontFamily:'Georgia, serif'}}>
-                "Se non riesci a spiegarlo, non lo hai capito" 
+                "Se non riesci a spiegarlo, non lo hai capito"
               </p>
               <p className="text-gray-500 text-xs mt-1">— Feynman dixit 🏆</p>
             </div>
+          </div>
 
-                    <button
+          <button
             onClick={() => setOpen(false)}
             className="w-full flex items-center justify-center gap-2 py-4 text-gray-500 hover:text-white transition border-t border-white/5 text-sm"
           >
-            Chiudi <span className="text-lg">→</span>
+            Chiudi pannello <span>→</span>
           </button>
         </div>
       </div>
