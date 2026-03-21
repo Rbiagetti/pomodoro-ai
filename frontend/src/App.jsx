@@ -8,31 +8,58 @@ import Interrogazione from './pages/Interrogazione'
 import Sessioni from './pages/Sessioni'
 import Admin from './pages/Admin'
 import Layout from './components/Layout'
+import API from './services/api'
 
 export default function App() {
   const [user, setUser] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     const email = localStorage.getItem('user_email')
-    if (token && email) setUser({ email })
+    if (token && email) {
+      setUser({ email })
+      checkAdmin()
+    }
   }, [])
 
-  const handleLogin = (data) => setUser(data)
-  const handleLogout = () => { localStorage.clear(); setUser(null) }
+  const checkAdmin = async () => {
+    try {
+      await API.get('/sessions/admin/all')
+      setIsAdmin(true)
+    } catch(e) {
+      setIsAdmin(false)
+    }
+  }
+
+  const handleLogin = async (data) => {
+    setUser(data)
+    try {
+      await API.get('/sessions/admin/all')
+      setIsAdmin(true)
+    } catch(e) {
+      setIsAdmin(false)
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.clear()
+    setUser(null)
+    setIsAdmin(false)
+  }
 
   if (!user) return <Login onLogin={handleLogin} />
 
   return (
     <BrowserRouter>
-      <Layout onLogout={handleLogout} user={user}>
+      <Layout onLogout={handleLogout} user={user} isAdmin={isAdmin}>
         <Routes>
           <Route path="/" element={<Timer />} />
           <Route path="/pomodoro" element={<Pomodoro />} />
           <Route path="/sintesi" element={<Sintesi />} />
           <Route path="/interrogazione" element={<Interrogazione />} />
           <Route path="/sessioni" element={<Sessioni />} />
-          <Route path="/admin" element={<Admin />} />
+          {isAdmin && <Route path="/admin" element={<Admin />} />}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout>
