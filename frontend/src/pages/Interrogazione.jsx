@@ -58,8 +58,8 @@ export default function Interrogazione() {
     try {
       window.speechSynthesis?.cancel()
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-      const mimeType = isIOS ? 'audio/mp4' : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'
+      const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
+      const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || 'audio/mp4'
       const recorder = new MediaRecorder(stream, { mimeType })
       const chunks = []
       recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data) }
@@ -68,7 +68,8 @@ export default function Interrogazione() {
         setLoading(true)
         try {
           const formData = new FormData()
-          formData.append('file', blob, isIOS ? 'risposta.m4a' : 'risposta.webm')
+          const ext = mimeType.includes('mp4') ? 'm4a' : mimeType.includes('ogg') ? 'ogg' : 'webm'
+          formData.append('file', blob, 'risposta.' + ext)
           const { data } = await API.post('/audio/transcribe', formData)
           await invia(data.trascrizione)
         } catch(e) { alert('Errore trascrizione: ' + e.message); setLoading(false) }
