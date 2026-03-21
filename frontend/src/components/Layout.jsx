@@ -89,8 +89,8 @@ export default function Layout({ children, onLogout, user }) {
       </div>
 
       {/* Demo banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 text-center py-2 text-xs" style={{background:'rgba(20,18,16,0.9)', borderTop:'1px solid var(--border)', color:'var(--muted)', backdropFilter:'blur(8px)'}}>
-        App in versione demo · Possibili tempi di risposta più lunghi in momenti di alto traffico
+      <div className="fixed bottom-0 left-0 right-0 z-30 text-center py-1" style={{color:'var(--muted)', opacity:0.4, fontSize:'10px'}}>
+        App demo · tempi più lunghi in momenti di alto traffico
       </div>
 
       {/* Content */}
