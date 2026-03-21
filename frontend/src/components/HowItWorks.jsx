@@ -84,7 +84,7 @@ export default function HowItWorks() {
               <h3 className="text-white font-bold" style={{fontFamily:'Georgia, serif'}}>Come funziona ✨</h3>
               <p className="text-gray-500 text-xs mt-0.5">Feynman + Socrate + AI = 🔥</p>
             </div>
-            <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition text-sm">✕</button>
+            
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
@@ -141,7 +141,12 @@ export default function HowItWorks() {
               <p className="text-gray-500 text-xs mt-1">— Feynman dixit 🏆</p>
             </div>
 
-          </div>
+                    <button
+            onClick={() => setOpen(false)}
+            className="w-full flex items-center justify-center gap-2 py-4 text-gray-500 hover:text-white transition border-t border-white/5 text-sm"
+          >
+            Chiudi <span className="text-lg">→</span>
+          </button>
         </div>
       </div>
     </>
