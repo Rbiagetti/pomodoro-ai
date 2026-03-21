@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import PomodoroTimer from './PomodoroTimer'
 
-export default function Layout({ children, onLogout, user, isAdmin }) {
+export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
@@ -10,7 +10,6 @@ export default function Layout({ children, onLogout, user, isAdmin }) {
   const navItems = [
     { icon: '🍅', label: 'Studia', path: '/' },
     { icon: '📚', label: 'Sessioni', path: '/sessioni' },
-    ...(isAdmin ? [{ icon: '🛡️', label: 'Admin', path: '/admin' }] : []),
   ]
 
   return (
