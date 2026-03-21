@@ -67,8 +67,8 @@ export default function HowItWorks() {
 
             {/* Flow verticale */}
             <div className="relative">
-              {/* Linea verticale continua */}
-              <div className="absolute left-[19px] top-5 bottom-5 w-px bg-gradient-to-b from-red-500/50 via-blue-500/50 to-emerald-500/50" />
+              
+              
 
               <div className="space-y-1">
                 {steps.map((step, i) => (
