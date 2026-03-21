@@ -33,8 +33,8 @@ export default function Layout({ children, onLogout, user }) {
 
           {/* Logo */}
           <div className="flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shadow-lg" style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))'}}>
-              🍅
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden" style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))'}}>
+              <img src="/logo.png" alt="logo" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <div className="font-bold tracking-tight" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", fontSize:'15px'}}>Pomodoro AI</div>

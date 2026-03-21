@@ -42,8 +42,8 @@ export default function Timer() {
       <div className="w-full max-w-sm">
 
         <div className="text-center mb-10">
-          <div className="inline-flex w-20 h-20 rounded-3xl items-center justify-center text-4xl mb-4 shadow-2xl" style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))'}}>
-            🍅
+          <div className="inline-flex w-20 h-20 rounded-3xl items-center justify-center mb-4 shadow-2xl overflow-hidden" style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))'}}>
+            <img src="/logo.png" alt="Pomodoro AI" className="w-14 h-14 object-contain" />
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif"}}>
             Cosa studi oggi?
