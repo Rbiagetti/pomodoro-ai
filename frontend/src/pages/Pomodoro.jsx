@@ -51,7 +51,7 @@ export default function Pomodoro() {
             </defs>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="font-mono font-bold text-5xl text-white leading-none">{mins}:{secs}</div>
+            <div className="font-mono font-bold text-5xl text-white leading-none tracking-widest">{mins}:{secs}</div>
             <div className="text-gray-500 text-xs mt-2">🍅 pomodoro</div>
           </div>
         </div>

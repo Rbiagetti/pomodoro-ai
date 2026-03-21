@@ -145,7 +145,7 @@ export default function PomodoroTimer() {
     <div className={`flex items-center gap-3 px-4 py-2 rounded-xl border backdrop-blur-xl shadow-lg ${style.bg} ${style.border}`}>
       <div className="text-right">
         <div className={`text-[10px] font-medium uppercase tracking-wider ${style.color} opacity-70`}>{style.label}</div>
-        <div className={`font-mono font-bold text-lg leading-tight ${style.color}`}>{mins}:{secs}</div>
+        <div className={`font-mono font-bold text-lg leading-tight tracking-widest ${style.color}`}>{mins}:{secs}</div>
       </div>
       <div className="flex gap-1">
         <button onClick={togglePause} className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition hover:scale-110 ${style.bg} border ${style.border}`}>
