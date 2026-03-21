@@ -21,7 +21,7 @@ export default function Sintesi() {
     const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm' })
     const chunks = []
     recorder.ondataavailable = e => chunks.push(e.data)
-    recorder.onstop = () => setAudioBlob(new Blob(chunks))
+    recorder.onerror = (e) => alert("Errore recorder: " + e.error); recorder.onstop = () => setAudioBlob(new Blob(chunks))
     recorder.start()
     mediaRef.current = recorder
     setRecording(true)
