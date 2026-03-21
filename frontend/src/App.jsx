@@ -8,7 +8,7 @@ import Interrogazione from './pages/Interrogazione'
 import Sessioni from './pages/Sessioni'
 import Admin from './pages/Admin'
 import Layout from './components/Layout'
-import API from './services/api'
+import { supabase } from './services/supabase'
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -17,29 +17,30 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     const email = localStorage.getItem('user_email')
+    const userId = localStorage.getItem('user_id')
     if (token && email) {
       setUser({ email })
-      checkAdmin()
+      if (userId) checkAdmin(userId)
     }
   }, [])
 
-  const checkAdmin = async () => {
+  const checkAdmin = async (userId) => {
     try {
-      await API.get('/sessions/admin/all')
-      setIsAdmin(true)
+      const { data } = await supabase
+        .from('admins')
+        .select('user_id')
+        .eq('user_id', userId)
+        .single()
+      setIsAdmin(!!data)
     } catch(e) {
       setIsAdmin(false)
     }
   }
 
   const handleLogin = async (data) => {
+    localStorage.setItem('user_id', data.user_id)
     setUser(data)
-    try {
-      await API.get('/sessions/admin/all')
-      setIsAdmin(true)
-    } catch(e) {
-      setIsAdmin(false)
-    }
+    checkAdmin(data.user_id)
   }
 
   const handleLogout = () => {
