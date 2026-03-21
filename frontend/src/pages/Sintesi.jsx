@@ -3,11 +3,23 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 
 function getSupportedMimeType() {
-  const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
+  const types = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/mp4',
+    'audio/ogg',
+    '',
+  ]
   for (const type of types) {
-    if (MediaRecorder.isTypeSupported(type)) return type
+    if (type === '' || MediaRecorder.isTypeSupported(type)) return type
   }
   return ''
+}
+
+function mimeToExt(mimeType) {
+  if (mimeType.includes('mp4')) return 'm4a'
+  if (mimeType.includes('ogg')) return 'ogg'
+  return 'webm'
 }
 
 export default function Sintesi() {
@@ -20,6 +32,7 @@ export default function Sintesi() {
   const [recording, setRecording] = useState(false)
   const [audioBlob, setAudioBlob] = useState(null)
   const [audioUrl, setAudioUrl] = useState(null)
+  const [mimeType, setMimeType] = useState('')
   const [uploadedFile, setUploadedFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -34,20 +47,21 @@ export default function Sintesi() {
       setAudioUrl(null)
       chunksRef.current = []
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mimeType = getSupportedMimeType()
-      const options = mimeType ? { mimeType } : {}
+      const mime = getSupportedMimeType()
+      const options = mime ? { mimeType: mime } : {}
       const recorder = new MediaRecorder(stream, options)
+      const actualMime = recorder.mimeType || mime || 'audio/webm'
+      setMimeType(actualMime)
       recorder.ondataavailable = e => {
         if (e.data && e.data.size > 0) chunksRef.current.push(e.data)
       }
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
-        const url = URL.createObjectURL(blob)
+        const blob = new Blob(chunksRef.current, { type: actualMime })
         setAudioBlob(blob)
-        setAudioUrl(url)
+        setAudioUrl(URL.createObjectURL(blob))
         stream.getTracks().forEach(t => t.stop())
       }
-      recorder.start(100)
+      recorder.start(250)
       mediaRef.current = recorder
       setRecording(true)
     } catch(e) {
@@ -69,8 +83,12 @@ export default function Sintesi() {
     setError(null)
     try {
       const formData = new FormData()
-      const ext = tab === 'carica' ? uploadedFile.name.split('.').pop() : 'mp4'
-      formData.append('file', file, `sintesi.${ext}`)
+      if (tab === 'registra') {
+        const ext = mimeToExt(mimeType)
+        formData.append('file', file, `sintesi.${ext}`)
+      } else {
+        formData.append('file', file, uploadedFile.name)
+      }
       const { data: trascrData } = await API.post('/audio/transcribe', formData)
       const { data: analisiData } = await API.post('/audio/analyze', {
         argomento,
@@ -113,7 +131,6 @@ export default function Sintesi() {
         </div>
 
         <div className="bg-white/[0.03] border border-white/[0.07] rounded-3xl p-6 space-y-4">
-
           {tab === 'registra' && (
             <>
               <button
@@ -124,21 +141,15 @@ export default function Sintesi() {
                 style={!recording ? {background:'linear-gradient(135deg,#ef4444,#f97316)'} : {}}
               >
                 {recording && <span className="absolute inset-0 bg-red-500/10 animate-pulse rounded-2xl" />}
-                <span className="relative z-10">
-                  {recording ? '⏹ Stop registrazione' : '🔴 Inizia a registrare'}
-                </span>
+                <span className="relative z-10">{recording ? '⏹ Stop registrazione' : '🔴 Inizia a registrare'}</span>
               </button>
-
               {recording && (
                 <div className="flex items-center justify-center gap-2 text-red-400 text-sm animate-pulse">
                   <span className="w-2 h-2 bg-red-400 rounded-full" />
                   Sto registrando...
                 </div>
               )}
-
-              {audioUrl && (
-                <audio controls src={audioUrl} className="w-full rounded-xl" />
-              )}
+              {audioUrl && <audio controls src={audioUrl} className="w-full rounded-xl" />}
             </>
           )}
 
@@ -151,29 +162,19 @@ export default function Sintesi() {
                 <span className="text-3xl">📁</span>
                 <span>{uploadedFile ? uploadedFile.name : 'Clicca per caricare un file MP3'}</span>
               </button>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".mp3,audio/mpeg"
-                className="hidden"
-                onChange={e => setUploadedFile(e.target.files[0] || null)}
-              />
-              {uploadedFile && (
-                <audio controls src={URL.createObjectURL(uploadedFile)} className="w-full rounded-xl" />
-              )}
+              <input ref={fileRef} type="file" accept=".mp3,audio/mpeg" className="hidden" onChange={e => setUploadedFile(e.target.files[0] || null)} />
+              {uploadedFile && <audio controls src={URL.createObjectURL(uploadedFile)} className="w-full rounded-xl" />}
             </>
           )}
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-xs">
-              {error}
-            </div>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-xs">{error}</div>
           )}
 
           <button
             onClick={analizza}
             disabled={!hasAudio || loading}
-            className="w-full py-4 rounded-2xl font-bold text-white text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-2xl font-bold text-white text-sm transition-all disabled:opacity-30"
             style={{background: hasAudio && !loading ? 'linear-gradient(135deg,#10b981,#059669)' : '#1f1f2e'}}
           >
             {loading ? '⏳ Analisi in corso...' : '📝 Trascrivi e analizza'}
