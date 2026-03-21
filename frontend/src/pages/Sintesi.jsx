@@ -3,11 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 
 function getSupportedMimeType() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  if (isIOS) return 'audio/mp4'
-  if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus'
-  if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm'
+  const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) return type
+  }
   return 'audio/mp4'
 }
 
@@ -45,7 +44,7 @@ export default function Sintesi() {
       const mime = getSupportedMimeType()
       const options = mime ? { mimeType: mime } : {}
       const recorder = new MediaRecorder(stream, options)
-      const actualMime = recorder.mimeType || mime || 'audio/webm'
+      const actualMime = recorder.mimeType || mime || 'audio/mp4'
       setMimeType(actualMime)
       recorder.ondataavailable = e => {
         if (e.data && e.data.size > 0) chunksRef.current.push(e.data)
