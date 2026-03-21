@@ -60,7 +60,7 @@ export default function HowItWorks() {
             <span className="text-sm">✨</span>
             <span className="text-white text-xs font-medium">Come funziona?</span>
             <button onClick={() => setShowBubble(false)} className="text-gray-600 hover:text-gray-400 text-xs ml-1">✕</button>
-            <div className="absolute bottom-[-6px] right-3 w-3 h-3 bg-[#1a1a2e] border-r border-b border-white/10 rotate-45" />
+            <div className="absolute bottom-[-6px] right-4 w-3 h-3 bg-[#1a1a2e] border-r border-b border-white/10 rotate-45" />
           </div>
         )}
         <button
