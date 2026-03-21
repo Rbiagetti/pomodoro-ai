@@ -8,7 +8,12 @@ export default function Interrogazione() {
   const navigate = useNavigate()
   const { argomento, durata, trascrizione, analisi } = state || {}
 
-  const [chat, setChat] = useState([])
+  const [chat, setChat] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('chat_history')
+      return saved ? JSON.parse(saved) : []
+    } catch { return [] }
+  })
   const [risposta, setRisposta] = useState('')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -58,6 +63,7 @@ export default function Interrogazione() {
     const t = testo || risposta
     if (!t.trim()) return
     const newHistory = [...chat, { role: 'user', content: t }]
+    sessionStorage.setItem('chat_history', JSON.stringify(newHistory))
     setChat(newHistory)
     setRisposta('')
     await generaDomanda(newHistory)
@@ -105,6 +111,7 @@ export default function Interrogazione() {
         durata_minuti: Number(durata) || 25,
         chat_history: chat,
       })
+      sessionStorage.removeItem('chat_history')
       endChat()
       navigate('/')
     } catch (e) {
