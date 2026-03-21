@@ -29,7 +29,7 @@ export default function Pomodoro() {
     <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8">
       <div className="text-center">
         <p className="text-xs uppercase tracking-widest mb-2" style={{color:'var(--muted)'}}>Stai studiando</p>
-        <h2 className="text-2xl font-bold" style={{color:'var(--text)', fontFamily:"'Syne', sans-serif"}}>{argomento}</h2>
+        <h2 className="text-2xl font-bold" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif"}}>{argomento}</h2>
       </div>
 
       <div className="relative flex items-center justify-center">

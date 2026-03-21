@@ -37,7 +37,7 @@ export default function Layout({ children, onLogout, user }) {
               🍅
             </div>
             <div>
-              <div className="font-bold tracking-tight" style={{color:'var(--text)', fontFamily:"'Syne', sans-serif", fontSize:'15px'}}>Pomodoro AI</div>
+              <div className="font-bold tracking-tight" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", fontSize:'15px'}}>Pomodoro AI</div>
               <div className="text-xs truncate max-w-[130px]" style={{color:'var(--muted)'}}>{user?.email}</div>
             </div>
           </div>

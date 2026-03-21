@@ -4,17 +4,17 @@
 
 :root {
   --bg:        #0c0a08;
-  --surface:   #141210;
-  --surface2:  #1c1916;
+  --surface:   #181512;
+  --surface2:  #221e1a;
   --border:    rgba(255,180,80,0.08);
   --border2:   rgba(255,180,80,0.15);
-  --accent1:   #e8633a;
-  --accent2:   #d4873a;
-  --accent3:   #c4a24a;
+  --accent1:   #ff6b3d;
+  --accent2:   #f0943a;
+  --accent3:   #e8b84a;
   --success:   #5a9e6f;
-  --muted:     #6b5e50;
-  --text:      #f0e8df;
-  --text2:     #a8998a;
+  --muted:     #9a8878;
+  --text:      #f8f0e8;
+  --text2:     #c4b4a4;
 }
 
 * {
