@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import PomodoroTimer from './PomodoroTimer'
 import HowItWorks from './HowItWorks'
-import { useLocation } from 'react-router-dom'
 
 export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
