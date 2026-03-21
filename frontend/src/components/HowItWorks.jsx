@@ -110,7 +110,7 @@ export default function HowItWorks() {
 
           <button
             onClick={() => setOpen(false)}
-            className="w-full flex items-center justify-center gap-2 py-4 text-white font-bold transition border-t border-white/5 text-sm bg-blue-500/20 hover:bg-blue-500/30"
+            className="mx-5 mb-5 mt-2 rounded-full text-white font-bold text-sm transition" style={{background:"rgba(59,130,246,0.25)", border:"1px solid rgba(59,130,246,0.4)", backdropFilter:"blur(8px)", padding:"12px"}}
           >
             Chiudi
           </button>
