@@ -88,8 +88,13 @@ export default function Layout({ children, onLogout, user }) {
         <PomodoroTimer />
       </div>
 
+      {/* Demo banner */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 text-center py-2 text-xs" style={{background:'rgba(20,18,16,0.9)', borderTop:'1px solid var(--border)', color:'var(--muted)', backdropFilter:'blur(8px)'}}>
+        App in versione demo · Possibili tempi di risposta più lunghi in momenti di alto traffico
+      </div>
+
       {/* Content */}
-      <div className="pt-16 relative z-10">
+      <div className="pt-16 pb-8 relative z-10">
         {children}
       </div>
 
