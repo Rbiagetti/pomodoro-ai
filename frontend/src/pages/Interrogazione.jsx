@@ -67,15 +67,15 @@ export default function Interrogazione() {
     try {
       stopSpeaking()
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
+      const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm' })
       const chunks = []
       recorder.ondataavailable = e => chunks.push(e.data)
       recorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' })
+        const blob = new Blob(chunks)
         setLoading(true)
         try {
           const formData = new FormData()
-          formData.append('file', blob, 'risposta.wav')
+          formData.append('file', blob, 'risposta.mp4')
           const { data } = await API.post('/audio/transcribe', formData)
           await invia(data.trascrizione)
         } catch(e) {

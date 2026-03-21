@@ -18,10 +18,10 @@ export default function Sintesi() {
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const recorder = new MediaRecorder(stream)
+    const recorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm' })
     const chunks = []
     recorder.ondataavailable = e => chunks.push(e.data)
-    recorder.onstop = () => setAudioBlob(new Blob(chunks, { type: 'audio/wav' }))
+    recorder.onstop = () => setAudioBlob(new Blob(chunks))
     recorder.start()
     mediaRef.current = recorder
     setRecording(true)
@@ -39,7 +39,7 @@ export default function Sintesi() {
     setLoading(true)
     try {
       const formData = new FormData()
-      const filename = tab === 'registra' ? 'sintesi.wav' : uploadedFile.name
+      const filename = tab === 'registra' ? 'sintesi.mp4' : uploadedFile.name
       formData.append('file', file, filename)
       const { data: trascrData } = await API.post('/audio/transcribe', formData)
       const { data: analisiData } = await API.post('/audio/analyze', {

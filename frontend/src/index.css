@@ -28,3 +28,8 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
   border: none;
 }
+
+/* Fix zoom Safari iOS su input focus */
+input, textarea, select {
+  font-size: 16px !important;
+}
