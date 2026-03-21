@@ -30,7 +30,7 @@ export default function HowItWorks() {
             <span className="text-sm">✨</span>
             <span className="text-white text-xs font-medium">Come funziona?</span>
             <button onClick={() => setShowBubble(false)} className="text-gray-600 hover:text-gray-400 text-xs ml-1">✕</button>
-            <div className="absolute bottom-[-6px] right-2 w-3 h-3 bg-[#1a1a2e] border-r border-b border-white/10 rotate-45" />
+            <div className="absolute bottom-[-6px] right-4 w-3 h-3 bg-[#1a1a2e] border-r border-b border-white/10 rotate-45" />
           </div>
         )}
         <button
@@ -110,9 +110,9 @@ export default function HowItWorks() {
 
           <button
             onClick={() => setOpen(false)}
-            className="w-full flex items-center justify-center gap-2 py-4 text-gray-500 hover:text-white transition border-t border-white/5 text-sm"
+            className="w-full flex items-center justify-center gap-2 py-4 text-white font-bold transition border-t border-white/5 text-sm bg-blue-500/20 hover:bg-blue-500/30"
           >
-            Chiudi pannello <span>→</span>
+            Chiudi
           </button>
         </div>
       </div>
