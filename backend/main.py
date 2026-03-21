@@ -27,3 +27,8 @@ app.include_router(sessions.router)
 @app.get("/")
 def health_check():
     return {"status": "ok", "message": "Pomodoro AI API is running 🍅"}
+
+
+@app.head("/health")
+def health_head():
+    return {}
