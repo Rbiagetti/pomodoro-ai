@@ -1,24 +1,10 @@
-# Secrets
 backend/.env
 frontend/.env
-
-# Python
 __pycache__/
 *.pyc
 backend/venv/
-
-# Node
 frontend/node_modules/
-
-# Mac
 .DS_Store
-
-# Vite
 frontend/dist/
-
-# Vercel
 frontend/.vercel/
-
-# Misc
 mnt/
-*.txt.bak
