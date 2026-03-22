@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import PomodoroTimer from './PomodoroTimer'
 import HowItWorks from './HowItWorks'
+import Flame from './Flame'
+import StreakModal from './StreakModal'
 import API from '../services/api'
 
 function calcStreak(sessioni) {
@@ -28,11 +30,19 @@ function calcStreak(sessioni) {
 export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [streak, setStreak] = useState(0)
+  const [sessioni, setSessioni] = useState([])
+  const [streakOpen, setStreakOpen] = useState(false)
+  const [flameRect, setFlameRect] = useState(null)
+  const flameRef = useRef(null)
 
   useEffect(() => {
     if (!user) return
-    API.get('/sessions').then(({ data }) => setStreak(calcStreak(data))).catch(() => {})
+    API.get('/sessions').then(({ data }) => {
+      setSessioni(data)
+      setStreak(calcStreak(data))
+    }).catch(() => {})
   }, [user])
+
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -115,10 +125,20 @@ export default function Layout({ children, onLogout, user }) {
         </button>
         <div className="flex items-center gap-2">
           {streak > 0 && (
-            <span className="px-2 py-1 rounded-full text-xs font-bold"
-              style={{background:'rgba(232,99,58,0.15)', color:'var(--accent1)', border:'1px solid rgba(232,99,58,0.2)'}}>
-              🔥 {streak}
-            </span>
+            <button
+              ref={flameRef}
+              onClick={() => {
+                if (flameRef.current) setFlameRect(flameRef.current.getBoundingClientRect())
+                setStreakOpen(true)
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-2xl transition-all duration-200 active:scale-95"
+              style={{background:'rgba(232,99,58,0.12)', border:'1px solid rgba(232,99,58,0.25)'}}
+            >
+              <Flame size={18} intensity={Math.min(2, streak / 3 + 0.5)} />
+              <span className="text-sm font-bold" style={{color:'#ff6b3d', fontFamily:"'Space Mono', monospace"}}>
+                {streak}
+              </span>
+            </button>
           )}
           <PomodoroTimer />
         </div>
@@ -136,6 +156,11 @@ export default function Layout({ children, onLogout, user }) {
 
       {/* How it works — solo in home */}
       {location.pathname === '/' && <HowItWorks />}
+
+      {/* Streak modal */}
+      {streakOpen && (
+        <StreakModal sessioni={sessioni} onClose={() => setStreakOpen(false)} originRect={flameRect} />
+      )}
     </div>
   )
 }
