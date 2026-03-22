@@ -1,10 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import PomodoroTimer from './PomodoroTimer'
 import HowItWorks from './HowItWorks'
+import API from '../services/api'
+
+function calcStreak(sessioni) {
+  const dates = [...new Set(
+    sessioni.map(s => s.study_date || s.created_at?.split('T')[0])
+  )].filter(Boolean).sort().reverse()
+  if (!dates.length) return 0
+  const today = new Date().toISOString().split('T')[0]
+  let streak = 0
+  let expected = today
+  for (const d of dates) {
+    if (d === expected) {
+      streak++
+      const dt = new Date(expected)
+      dt.setDate(dt.getDate() - 1)
+      expected = dt.toISOString().split('T')[0]
+    } else if (d < expected) {
+      break
+    }
+  }
+  return streak
+}
 
 export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [streak, setStreak] = useState(0)
+
+  useEffect(() => {
+    if (!user) return
+    API.get('/sessions').then(({ data }) => setStreak(calcStreak(data))).catch(() => {})
+  }, [user])
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -85,7 +113,15 @@ export default function Layout({ children, onLogout, user }) {
             <rect y="14.5" width="18" height="1.5" rx="1" fill="var(--text2)"/>
           </svg>
         </button>
-        <PomodoroTimer />
+        <div className="flex items-center gap-2">
+          {streak > 0 && (
+            <span className="px-2 py-1 rounded-full text-xs font-bold"
+              style={{background:'rgba(232,99,58,0.15)', color:'var(--accent1)', border:'1px solid rgba(232,99,58,0.2)'}}>
+              🔥 {streak}
+            </span>
+          )}
+          <PomodoroTimer />
+        </div>
       </div>
 
       {/* Demo banner */}

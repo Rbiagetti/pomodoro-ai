@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import API from '../services/api'
+import API, { setRetryCallback } from '../services/api'
 import { endChat } from '../components/PomodoroTimer'
 
 export default function Interrogazione() {
@@ -13,12 +13,17 @@ export default function Interrogazione() {
   })
   const [risposta, setRisposta] = useState('')
   const [loading, setLoading] = useState(false)
+  const [retryMsg, setRetryMsg] = useState(null)
   const [saving, setSaving] = useState(false)
   const [recording, setRecording] = useState(false)
   const [aiSpeaking, setAiSpeaking] = useState(false)
   const mediaRef = useRef(null)
   const chatEndRef = useRef(null)
 
+  useEffect(() => {
+    setRetryCallback(msg => setRetryMsg(msg))
+    return () => setRetryCallback(null)
+  }, [])
   useEffect(() => { if (chat.length === 0) generaDomanda([]) }, [])
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [chat, loading])
 
@@ -130,7 +135,7 @@ export default function Interrogazione() {
             <div className="flex justify-start items-end gap-2">
               <div className="w-7 h-7 rounded-full flex-shrink-0" style={{background:'var(--surface)', border:'1px solid var(--border)'}} />
               <div className="rounded-2xl px-4 py-3 text-sm animate-pulse" style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--muted)'}}>
-                L'AI sta pensando...
+                {retryMsg || "L'AI sta pensando..."}
               </div>
             </div>
           )}

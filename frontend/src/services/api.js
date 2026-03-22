@@ -10,4 +10,21 @@ API.interceptors.request.use((config) => {
   return config
 })
 
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+
+let retryCallback = null
+export const setRetryCallback = (fn) => { retryCallback = fn }
+
+API.interceptors.response.use(null, async (error) => {
+  const config = error.config
+  if (error.response?.status === 429 && (config._retryCount || 0) < 2) {
+    config._retryCount = (config._retryCount || 0) + 1
+    retryCallback?.(`AI occupata, riprovo... (${config._retryCount}/2)`)
+    await sleep(10000)
+    return API(config)
+  }
+  retryCallback?.(null)
+  return Promise.reject(error)
+})
+
 export default API
