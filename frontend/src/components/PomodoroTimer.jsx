@@ -121,7 +121,8 @@ export default function PomodoroTimer() {
 
   if (state.phase === 'IDLE') {
     return (
-      <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm ${style.bg} ${style.border}`}>
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
+        style={{background: style.bg, borderColor: style.border}}>
         <span className="text-gray-600 text-xs">⏱️ Pronto</span>
         <button onClick={toggleSound} className="text-gray-700 hover:text-gray-400 text-xs ml-1 transition">
           {state.soundEnabled ? '🔊' : '🔇'}
@@ -132,8 +133,9 @@ export default function PomodoroTimer() {
 
   if (state.phase === 'CHAT_ACTIVE') {
     return (
-      <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm ${style.bg} ${style.border}`}>
-        <span className={`text-xs font-medium ${style.color}`}>💬</span>
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
+        style={{background: style.bg, borderColor: style.border}}>
+        <span className="text-xs font-medium" style={{color: style.color}}>💬</span>
         <button onClick={toggleSound} className="text-gray-700 hover:text-gray-400 text-xs ml-1 transition">
           {state.soundEnabled ? '🔊' : '🔇'}
         </button>
@@ -142,13 +144,15 @@ export default function PomodoroTimer() {
   }
 
   return (
-    <div className={`flex items-center gap-3 px-4 py-2 rounded-xl border backdrop-blur-xl shadow-lg ${style.bg} ${style.border}`}>
+    <div className="flex items-center gap-3 px-4 py-2 rounded-xl border backdrop-blur-xl shadow-lg min-w-0"
+      style={{background: style.bg, borderColor: style.border}}>
       <div className="text-right">
-        <div className={`text-[10px] font-medium uppercase tracking-wider ${style.color} opacity-70`}>{style.label}</div>
-        <div className={`font-mono font-bold text-lg leading-tight tracking-widest ${style.color}`}>{mins}:{secs}</div>
+        <div className="text-[10px] font-medium uppercase tracking-wider opacity-70" style={{color: style.color}}>{style.label}</div>
+        <div className="font-mono font-bold text-lg leading-tight tracking-widest" style={{color: style.color}}>{mins}:{secs}</div>
       </div>
       <div className="flex gap-1">
-        <button onClick={togglePause} className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition hover:scale-110 ${style.bg} border ${style.border}`}>
+        <button onClick={togglePause} className="w-7 h-7 rounded-lg flex items-center justify-center text-xs transition hover:scale-110 border"
+          style={{background: style.bg, borderColor: style.border}}>
           {state.running ? '⏸' : '▶️'}
         </button>
         <button onClick={toggleSound} className="w-7 h-7 rounded-lg flex items-center justify-center text-xs bg-white/5 border border-white/10 transition hover:scale-110">

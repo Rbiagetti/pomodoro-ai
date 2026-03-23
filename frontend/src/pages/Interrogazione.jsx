@@ -111,7 +111,6 @@ export default function Interrogazione() {
   }
 
   const stopRecording = () => {
-    // Chiudi stream subito — non aspettare onstop
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
     mediaRef.current?.stop()
@@ -134,17 +133,17 @@ export default function Interrogazione() {
   }
 
   return (
-    <div className="h-screen flex flex-col p-4 overflow-hidden">
-      <div className="max-w-md w-full mx-auto flex flex-col flex-1 min-h-0">
-
-        {/* Header */}
-        <div className="rounded-2xl p-4 mb-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          <h2 className="font-bold text-center" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", fontSize:'18px', letterSpacing:'0.5px'}}>🤖 Interrogazione AI</h2>
-          <p className="text-sm text-center mt-1" style={{color:'var(--muted)'}}>{argomento}</p>
+    <>
+      {/* Header fisso sotto topbar */}
+      <div className="fixed left-0 right-0 z-20 px-4 pt-2 pb-2" style={{top:'56px', background:'var(--bg)'}}>
+        <div className="max-w-md mx-auto rounded-2xl p-3" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <p className="text-sm text-center font-medium" style={{color:'var(--muted)'}}>{argomento}</p>
         </div>
+      </div>
 
-        {/* Chat */}
-        <div className="flex-1 overflow-y-auto space-y-3 mb-4 min-h-0">
+      {/* Chat scrollabile */}
+      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top:'140px', bottom:'150px'}}>
+        <div className="max-w-md mx-auto space-y-3">
           {chat.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2`}>
               {msg.role === 'assistant' && (
@@ -185,9 +184,11 @@ export default function Interrogazione() {
           )}
           <div ref={chatEndRef} />
         </div>
+      </div>
 
-        {/* Input */}
-        <div className="space-y-3">
+      {/* Input fisso in basso */}
+      <div className="fixed left-0 right-0 bottom-0 z-20 px-4 pb-4 pt-2" style={{background:'var(--bg)'}}>
+        <div className="max-w-md mx-auto space-y-3">
           {recording && (
             <div className="flex items-center justify-center gap-2 text-sm animate-pulse" style={{color:'var(--accent1)'}}>
               <span className="w-2 h-2 rounded-full" style={{background:'var(--accent1)'}} />
@@ -225,6 +226,6 @@ export default function Interrogazione() {
           </button>
         </div>
       </div>
-    </div>
+    </>
   )
 }

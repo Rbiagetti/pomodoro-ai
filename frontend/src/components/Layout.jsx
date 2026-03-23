@@ -33,7 +33,20 @@ export default function Layout({ children, onLogout, user }) {
   const [sessioni, setSessioni] = useState([])
   const [streakOpen, setStreakOpen] = useState(false)
   const [flameRect, setFlameRect] = useState(null)
+  const [pillVisible, setPillVisible] = useState(false)
   const flameRef = useRef(null)
+
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.pathname === '/interrogazione') {
+      const t = setTimeout(() => setPillVisible(true), 50)
+      return () => clearTimeout(t)
+    } else {
+      setPillVisible(false)
+    }
+  }, [location.pathname])
 
   useEffect(() => {
     if (!user) return
@@ -42,9 +55,6 @@ export default function Layout({ children, onLogout, user }) {
       setStreak(calcStreak(data))
     }).catch(() => {})
   }, [user])
-
-  const navigate = useNavigate()
-  const location = useLocation()
 
   const navItems = [
     { icon: '🍅', label: 'Studia', path: '/' },
@@ -111,10 +121,10 @@ export default function Layout({ children, onLogout, user }) {
       </div>
 
       {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3">
+      <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3" style={{background:'rgba(12,10,8,0.85)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,180,80,0.06)'}}>
         <button
           onClick={() => setSidebarOpen(true)}
-          className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200"
+          className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
           style={{background:'rgba(255,255,255,0.04)', border:'1px solid var(--border)'}}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -123,6 +133,24 @@ export default function Layout({ children, onLogout, user }) {
             <rect y="14.5" width="18" height="1.5" rx="1" fill="var(--text2)"/>
           </svg>
         </button>
+
+        {/* Pillola centrata */}
+        {location.pathname === '/interrogazione' && (
+          <div
+            className="absolute left-1/2 flex items-center gap-2 px-4 py-1.5 rounded-full"
+            style={{
+              transform: pillVisible ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0.3)',
+              opacity: pillVisible ? 1 : 0,
+              transition: 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease',
+              background: 'rgba(255,107,61,0.15)',
+              border: '1px solid rgba(255,107,61,0.3)',
+            }}
+          >
+            <span style={{fontSize:'14px'}}>🤖</span>
+            <span className="text-sm font-bold" style={{color:'var(--accent1)', fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>Interrogazione AI</span>
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
           {streak > 0 && (
             <button
@@ -131,7 +159,7 @@ export default function Layout({ children, onLogout, user }) {
                 if (flameRef.current) setFlameRect(flameRef.current.getBoundingClientRect())
                 setStreakOpen(true)
               }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-2xl transition-all duration-200 active:scale-95"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-2xl transition-all duration-200 active:scale-95 flex-shrink-0"
               style={{background:'rgba(232,99,58,0.12)', border:'1px solid rgba(232,99,58,0.25)'}}
             >
               <Flame size={18} intensity={Math.min(2, streak / 3 + 0.5)} />
