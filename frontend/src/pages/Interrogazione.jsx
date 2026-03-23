@@ -18,6 +18,19 @@ export default function Interrogazione() {
   const [recording, setRecording] = useState(false)
   const [aiSpeaking, setAiSpeaking] = useState(false)
   const mediaRef = useRef(null)
+  const streamRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop())
+        streamRef.current = null
+      }
+      if (mediaRef.current?.state !== 'inactive') {
+        mediaRef.current?.stop()
+      }
+    }
+  }, [])
   const chatEndRef = useRef(null)
 
   useEffect(() => {
@@ -92,11 +105,18 @@ export default function Interrogazione() {
           await invia(data.trascrizione)
         } catch(e) { alert('Errore trascrizione: ' + e.message); setLoading(false) }
       }
+      streamRef.current = stream
       recorder.start(); mediaRef.current = recorder; setRecording(true)
     } catch(e) { alert('Microfono non disponibile') }
   }
 
-  const stopRecording = () => { mediaRef.current?.stop(); setRecording(false) }
+  const stopRecording = () => {
+    // Chiudi stream subito — non aspettare onstop
+    streamRef.current?.getTracks().forEach(t => t.stop())
+    streamRef.current = null
+    mediaRef.current?.stop()
+    setRecording(false)
+  }
 
   const salva = async () => {
     setSaving(true)
