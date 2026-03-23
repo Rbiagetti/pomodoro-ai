@@ -62,10 +62,23 @@ export default function Interrogazione() {
   const startRecording = async () => {
     try {
       window.speechSynthesis?.cancel()
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        }
+      })
       const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
       const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || 'audio/mp4'
-      const recorder = new MediaRecorder(stream, { mimeType })
+      let recorder
+      try {
+        recorder = new MediaRecorder(stream, { mimeType })
+      } catch(e) {
+        recorder = new MediaRecorder(stream)
+      }
       const chunks = []
       recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data) }
       recorder.onstop = async () => {

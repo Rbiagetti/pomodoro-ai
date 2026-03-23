@@ -38,7 +38,15 @@ export default function Sintesi() {
     try {
       setError(null); setAudioBlob(null); setAudioUrl(null)
       chunksRef.current = []
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        }
+      })
       const mime = getSupportedMimeType()
       const recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : {})
       const actualMime = recorder.mimeType || mime || 'audio/mp4'
