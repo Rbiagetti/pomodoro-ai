@@ -95,7 +95,7 @@ const PHASE_ICON = {
   BREAK_ACTIVE:    Coffee,
 }
 
-export default function PomodoroTimer() {
+export default function PomodoroTimer({ hideCountdown = false }) {
   const state = useTimerState()
   const intervalRef = useRef(null)
 
@@ -134,10 +134,9 @@ export default function PomodoroTimer() {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
         style={{background: style.bg, borderColor: style.border}}>
-        <Clock size={14} color={style.color} />
-        <span className="text-xs" style={{color: style.color}}>Pronto</span>
-        <button onClick={toggleSound} className="ml-1 transition opacity-50 hover:opacity-100">
-          <SoundIcon size={12} color={style.color} />
+        {!hideCountdown && <><Clock size={14} color={style.color} /><span className="text-xs" style={{color: style.color}}>Pronto</span></>}
+        <button onClick={toggleSound} className={hideCountdown ? '' : 'ml-1'} style={{opacity:0.5}}>
+          <SoundIcon size={hideCountdown ? 16 : 12} color={style.color} />
         </button>
       </div>
     )
@@ -156,22 +155,24 @@ export default function PomodoroTimer() {
   }
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 rounded-xl border backdrop-blur-xl shadow-lg min-w-0"
+    <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-xl shadow-lg min-w-0"
       style={{background: style.bg, borderColor: style.border}}>
-      <div className="text-center">
-        <div className="flex items-center gap-1 justify-center opacity-70">
-          <PhaseIcon size={10} color={style.color} />
-          <span className="text-[10px] font-medium uppercase tracking-wider" style={{color: style.color}}>{style.label}</span>
+      {!hideCountdown && (
+        <div className="text-center">
+          <div className="flex items-center gap-1 justify-center opacity-70">
+            <PhaseIcon size={10} color={style.color} />
+            <span className="text-[10px] font-medium uppercase tracking-wider" style={{color: style.color}}>{style.label}</span>
+          </div>
+          <div className="font-mono font-bold text-lg leading-tight tracking-widest text-center" style={{color: style.color}}>{mins}:{secs}</div>
         </div>
-        <div className="font-mono font-bold text-lg leading-tight tracking-widest text-center" style={{color: style.color}}>{mins}:{secs}</div>
-      </div>
+      )}
       <div className="flex gap-1">
         <button onClick={togglePause} className="w-7 h-7 rounded-lg flex items-center justify-center transition hover:scale-110 border"
           style={{background: style.bg, borderColor: style.border}}>
-          {state.running ? <Pause size={12} color={style.color} /> : <Play size={12} color={style.color} />}
+          {state.running ? <Pause size={hideCountdown ? 16 : 12} color={style.color} /> : <Play size={hideCountdown ? 16 : 12} color={style.color} />}
         </button>
         <button onClick={toggleSound} className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 transition hover:scale-110">
-          <SoundIcon size={12} color={style.color} />
+          <SoundIcon size={hideCountdown ? 16 : 12} color={style.color} />
         </button>
       </div>
     </div>

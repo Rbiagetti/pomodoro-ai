@@ -118,6 +118,7 @@ export default function Interrogazione() {
         chat_history: chat,
       })
       sessionStorage.removeItem('chat_history')
+      window.dispatchEvent(new Event('session-saved'))
       endChat(); navigate('/')
     } catch (e) { alert('Errore: ' + (e.response?.data?.detail || e.message)) }
     finally { setSaving(false) }

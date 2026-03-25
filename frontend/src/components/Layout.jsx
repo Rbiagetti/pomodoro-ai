@@ -5,16 +5,23 @@ import PomodoroTimer from './PomodoroTimer'
 import HowItWorks from './HowItWorks'
 import Flame from './Flame'
 import StreakModal from './StreakModal'
+import FloatingStreak from './FloatingStreak'
 import API from '../services/api'
 
 function calcStreak(sessioni) {
   const dates = [...new Set(
     sessioni.map(s => s.study_date || s.created_at?.split('T')[0])
   )].filter(Boolean).sort().reverse()
-  if (!dates.length) return 0
+
   const today = new Date().toISOString().split('T')[0]
+
+  const studiedToday = dates.includes(today)
+
+  // Se ho studiato oggi parto da oggi, altrimenti da ieri
+  // In entrambi i casi il numero mostrato è quello "congelato" se non ho studiato oggi
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
   let streak = 0
-  let expected = today
+  let expected = studiedToday ? today : yesterday
   for (const d of dates) {
     if (d === expected) {
       streak++
@@ -25,18 +32,21 @@ function calcStreak(sessioni) {
       break
     }
   }
-  return streak
+
+  return { streak, studiedToday }
 }
 
 const PHASE_PILLS = {
   '/pomodoro':       { icon: Timer, label: 'Focus', color: '#ff6b3d', bg: 'rgba(255,107,61,0.15)', border: 'rgba(255,107,61,0.3)' },
   '/sintesi':        { icon: Mic, label: 'Sintesi', color: '#f0943a', bg: 'rgba(240,148,58,0.15)', border: 'rgba(240,148,58,0.3)' },
   '/interrogazione': { icon: Bot, label: 'Interrogazione', color: '#c4a24a', bg: 'rgba(196,162,74,0.15)', border: 'rgba(196,162,74,0.3)' },
+  '/sessioni':       { icon: BookOpen, label: 'Sessioni', color: '#7a9e8a', bg: 'rgba(122,158,138,0.15)', border: 'rgba(122,158,138,0.3)' },
 }
 
 export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [streak, setStreak] = useState(0)
+  const [studiedToday, setStudiedToday] = useState(false)
   const [sessioni, setSessioni] = useState([])
   const [streakOpen, setStreakOpen] = useState(false)
   const [flameRect, setFlameRect] = useState(null)
@@ -57,12 +67,20 @@ export default function Layout({ children, onLogout, user }) {
     }
   }, [location.pathname])
 
-  useEffect(() => {
+  const fetchStreak = () => {
     if (!user) return
     API.get('/sessions').then(({ data }) => {
       setSessioni(data)
-      setStreak(calcStreak(data))
+      const { streak: s, studiedToday: st } = calcStreak(data)
+      setStreak(s)
+      setStudiedToday(st)
     }).catch(() => {})
+  }
+
+  useEffect(() => {
+    fetchStreak()
+    window.addEventListener('session-saved', fetchStreak)
+    return () => window.removeEventListener('session-saved', fetchStreak)
   }, [user])
 
   const navItems = [
@@ -133,50 +151,41 @@ export default function Layout({ children, onLogout, user }) {
       </div>
 
       {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3" style={{background:'rgba(12,10,8,0.6)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,180,80,0.06)'}}>
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
-          style={{background:'rgba(255,255,255,0.04)', border:'1px solid var(--border)'}}
-        >
-          <Menu size={18} color="var(--text2)" />
-        </button>
+      <div className="fixed top-0 left-0 right-0 z-30 flex items-center px-4 py-3 gap-2" style={{background:'rgba(12,10,8,0.6)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,180,80,0.06)'}}>
 
-        {/* Pillola fase centrata */}
-        {activePill && (
-          <div
-            className="absolute left-1/2 flex items-center gap-2 px-4 py-1.5 rounded-full"
-            style={{
-              transform: pillVisible ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0.3)',
-              opacity: pillVisible ? 1 : 0,
-              transition: 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease',
-              background: activePill.bg,
-              border: `1px solid ${activePill.border}`,
-            }}
+        {/* Sinistra — hamburger */}
+        <div className="flex-shrink-0">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200"
+            style={{background:'rgba(255,255,255,0.04)', border:'1px solid var(--border)'}}
           >
-            <activePill.icon size={14} color={activePill.color} />
-            <span className="text-sm font-bold" style={{color: activePill.color, fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>{activePill.label}</span>
-          </div>
-        )}
+            <Menu size={18} color="var(--text2)" />
+          </button>
+        </div>
 
-        <div className="flex items-center gap-2">
-          {streak > 0 && (
-            <button
-              ref={flameRef}
-              onClick={() => {
-                if (flameRef.current) setFlameRect(flameRef.current.getBoundingClientRect())
-                setStreakOpen(true)
+        {/* Centro — pillola fase */}
+        <div className="flex-1 flex justify-center">
+          {activePill && (
+            <div
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full"
+              style={{
+                transform: pillVisible ? 'scale(1)' : 'scale(0.3)',
+                opacity: pillVisible ? 1 : 0,
+                transition: 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease',
+                background: activePill.bg,
+                border: `1px solid ${activePill.border}`,
               }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-2xl transition-all duration-200 active:scale-95 flex-shrink-0"
-              style={{background:'rgba(232,99,58,0.12)', border:'1px solid rgba(232,99,58,0.25)'}}
             >
-              <Flame size={18} intensity={Math.min(2, streak / 3 + 0.5)} />
-              <span className="text-sm font-bold" style={{color:'#ff6b3d', fontFamily:"'Space Mono', monospace"}}>
-                {streak}
-              </span>
-            </button>
+              <activePill.icon size={14} color={activePill.color} />
+              <span className="text-sm font-bold" style={{color: activePill.color, fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>{activePill.label}</span>
+            </div>
           )}
-          <PomodoroTimer />
+        </div>
+
+        {/* Destra — solo sound + pause se non su /pomodoro, solo sound se su /pomodoro */}
+        <div className="flex-shrink-0">
+          <PomodoroTimer hideCountdown={location.pathname === '/pomodoro'} />
         </div>
       </div>
 
@@ -190,9 +199,16 @@ export default function Layout({ children, onLogout, user }) {
       {/* How it works — solo in home */}
       {location.pathname === '/' && <HowItWorks />}
 
+      {/* Floating streak widget */}
+      <FloatingStreak
+        streak={streak}
+        studiedToday={studiedToday}
+        onOpen={(rect) => { setFlameRect(rect); setStreakOpen(true) }}
+      />
+
       {/* Streak modal */}
       {streakOpen && (
-        <StreakModal sessioni={sessioni} onClose={() => setStreakOpen(false)} originRect={flameRect} />
+        <StreakModal sessioni={sessioni} currentStreak={streak} onClose={() => setStreakOpen(false)} originRect={flameRect} />
       )}
     </div>
   )

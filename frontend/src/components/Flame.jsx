@@ -1,5 +1,18 @@
 export default function Flame({ size = 24, intensity = 1 }) {
   const s = size
+  const off = intensity === 0
+
+  if (off) return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M12 2C12 2 7 7 7 13c0 2.8 2.2 5 5 5s5-2.2 5-5c0-2-1.5-3.5-1.5-3.5S14.5 11 13 11c0 0 1-2-1-9z"
+        fill="var(--muted)" opacity="0.3" />
+      <path
+        d="M12 6C12 6 9 10 9 13.5c0 1.7 1.3 3 3 3s3-1.3 3-3c0-1.2-0.8-2-0.8-2S13.5 12 12.5 12c0 0 0.5-1.5-0.5-6z"
+        fill="var(--muted)" opacity="0.2" />
+    </svg>
+  )
+
   return (
     <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <style>{`
@@ -24,21 +37,17 @@ export default function Flame({ size = 24, intensity = 1 }) {
         .glw { animation: glow 1.4s ease-in-out infinite; }
       `}</style>
 
-      {/* Glow base */}
       <ellipse className="glw" cx="12" cy="20" rx="6" ry="2.5"
         fill={`rgba(232,99,58,${0.25 * intensity})`} />
 
-      {/* Outer flame */}
       <path className="fl1"
         d="M12 2C12 2 7 7 7 13c0 2.8 2.2 5 5 5s5-2.2 5-5c0-2-1.5-3.5-1.5-3.5S14.5 11 13 11c0 0 1-2-1-9z"
         fill="url(#og)" />
 
-      {/* Mid flame */}
       <path className="fl2"
         d="M12 6C12 6 9 10 9 13.5c0 1.7 1.3 3 3 3s3-1.3 3-3c0-1.2-0.8-2-0.8-2S13.5 12 12.5 12c0 0 0.5-1.5-0.5-6z"
         fill="url(#my)" />
 
-      {/* Inner core */}
       <path className="fl3"
         d="M12 10C12 10 10.5 12 10.5 13.8c0 0.8 0.7 1.5 1.5 1.5s1.5-0.7 1.5-1.5c0-0.6-0.5-1.2-0.5-1.2S12.8 13 12.3 13c0 0 0.2-0.8-0.3-3z"
         fill="#fff5e0" opacity="0.9" />

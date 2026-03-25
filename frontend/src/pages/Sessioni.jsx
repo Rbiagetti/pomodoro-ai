@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Timer, Clock, HelpCircle, Search, Trash2, Star, Bot, User, Brain, FileText, ChevronLeft, X } from 'lucide-react'
+import { Timer, Clock, HelpCircle, Search, Trash2, Star, Bot, User, Brain, FileText, ChevronLeft, X, BookOpen } from 'lucide-react'
 import API from '../services/api'
+import PageHeader from '../components/PageHeader'
 
 function Stars({ n_domande, durata_minuti }) {
   const score = Math.min(5, Math.floor((n_domande / 5) + (durata_minuti / 25)))
@@ -94,11 +95,8 @@ export default function Sessioni() {
     <div className="min-h-screen p-4">
       <div className="max-w-md mx-auto">
 
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>Le mie sessioni</h2>
-          <button onClick={() => navigate('/')} className="text-sm transition flex items-center gap-1" style={{color:'var(--muted)'}}>
-            <ChevronLeft size={14} /> Torna
-          </button>
+        <div className="text-center mb-8">
+          <p className="text-xs uppercase tracking-widest" style={{color:'var(--muted)'}}>Il tuo storico di studio</p>
         </div>
 
         {/* Stats */}

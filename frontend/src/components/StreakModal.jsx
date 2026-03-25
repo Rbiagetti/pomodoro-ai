@@ -106,8 +106,9 @@ function CalendarMonth({ year, month, studiedDates, isCurrentMonth }) {
 
 const currentMonthRef = { current: null }
 
-export default function StreakModal({ sessioni, onClose, originRect }) {
-  const { current, best, streaks, studiedDates } = useMemo(() => calcAllStreaks(sessioni), [sessioni])
+export default function StreakModal({ sessioni, currentStreak, onClose, originRect }) {
+  const { best, streaks, studiedDates } = useMemo(() => calcAllStreaks(sessioni), [sessioni])
+  const current = currentStreak ?? 0
   const [visible, setVisible] = useState(false)
 
   const isMobile = window.innerWidth < 640
@@ -140,15 +141,14 @@ export default function StreakModal({ sessioni, onClose, originRect }) {
   const vw = window.innerWidth
   const vh = window.innerHeight
 
-  // Panel desktop: ancorato sotto la fiamma, allineato a destra con essa
-  const desktopWidth  = 400
-  const desktopLeft   = Math.min(vw - desktopWidth - 8, Math.max(8, flameX - desktopWidth + 30))
-  const desktopTop    = originRect ? originRect.bottom + 8 : 56
-
-  const panelLeft   = isMobile ? vw * 0.05                      : desktopLeft
-  const panelTop    = isMobile ? Math.max(8, flameY - 20)       : desktopTop
-  const panelWidth  = isMobile ? vw * 0.90                      : desktopWidth
-  const panelHeight = isMobile ? vh * 0.88                      : vh * 0.85
+  // Panel: si apre sopra se la sorgente è nella metà bassa dello schermo
+  const sourceInBottom = flameY > vh / 2
+  const panelWidth  = Math.min(400, vw - 16)
+  const panelHeight = Math.min(vh * 0.85, vh - 80)
+  const panelLeft   = Math.min(vw - panelWidth - 8, Math.max(8, flameX - panelWidth / 2))
+  const panelTop    = sourceInBottom
+    ? Math.max(8, flameY - panelHeight - 8)
+    : (originRect ? originRect.bottom + 8 : 56)
   const panelRadius = isMobile ? '24px'                         : '20px'
 
   const panelStyle = {

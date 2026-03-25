@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Mic, Square, Upload, FileText, CircleDot } from 'lucide-react'
 import API from '../services/api'
+import PageHeader from '../components/PageHeader'
 
 function getSupportedMimeType() {
   const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
@@ -82,13 +83,8 @@ export default function Sintesi() {
       <div className="w-full max-w-sm">
 
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>
-            <Mic size={28} color="var(--accent2)" />
-            Sintesi vocale
-          </h2>
-          <p style={{color:'var(--muted)', fontSize:'14px'}}>
-            Spiega tutto quello che ricordi su <span style={{color:'var(--accent1)'}}>{argomento}</span>
-          </p>
+          <p className="text-xs uppercase tracking-widest mb-1" style={{color:'var(--muted)'}}>Stai spiegando</p>
+          <h2 className="text-2xl font-bold" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif"}}>{argomento}</h2>
         </div>
 
         {/* Tab */}
