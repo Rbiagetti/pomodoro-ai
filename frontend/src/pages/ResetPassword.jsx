@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { KeyRound } from 'lucide-react'
+import { KeyRound, CheckCircle, AlertTriangle } from 'lucide-react'
 import { supabase } from '../services/supabase'
 
 export default function ResetPassword() {
@@ -9,15 +9,23 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+  const [validSession, setValidSession] = useState(null) // null=checking, true=ok, false=invalid
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Supabase mette la session nell'hash dopo il click sul link email
-    supabase.auth.onAuthStateChange((event) => {
+    // Controlla se c'è un token valido nell'hash (link email)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        // sessione attiva, possiamo aggiornare la password
+        setValidSession(true)
       }
     })
+
+    // Timeout: se dopo 2s non arriva PASSWORD_RECOVERY, link non valido
+    const timer = setTimeout(() => {
+      setValidSession(prev => prev === null ? false : prev)
+    }, 2000)
+
+    return () => { subscription.unsubscribe(); clearTimeout(timer) }
   }, [])
 
   const handleReset = async () => {
@@ -53,7 +61,36 @@ export default function ResetPassword() {
         </div>
 
         <div className="rounded-2xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          {!done ? (
+
+          {/* Checking session */}
+          {validSession === null && (
+            <div className="text-center py-4" style={{color:'var(--muted)', fontSize:'13px'}}>
+              Verifica link in corso...
+            </div>
+          )}
+
+          {/* Link non valido */}
+          {validSession === false && (
+            <div className="text-center space-y-4 py-2">
+              <div className="flex justify-center">
+                <AlertTriangle size={36} color="var(--accent1)" />
+              </div>
+              <p className="font-semibold" style={{color:'var(--text)'}}>Link non valido</p>
+              <p className="text-xs" style={{color:'var(--muted)'}}>
+                Questo link è scaduto o è già stato usato. Richiedi un nuovo reset dalla pagina di login.
+              </p>
+              <button
+                onClick={() => navigate('/')}
+                className="w-full py-3 rounded-2xl font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2"
+                style={{background:'rgba(255,255,255,0.05)', color:'var(--muted)', border:'1px solid var(--border)'}}
+              >
+                Torna al login
+              </button>
+            </div>
+          )}
+
+          {/* Form reset */}
+          {validSession === true && !done && (
             <>
               <input
                 type="password" placeholder="Nuova password" value={password}
@@ -84,13 +121,19 @@ export default function ResetPassword() {
                 {loading ? '...' : <><KeyRound size={16} /> Aggiorna password</>}
               </button>
             </>
-          ) : (
+          )}
+
+          {/* Successo */}
+          {done && (
             <div className="text-center space-y-4 py-2">
-              <div className="text-4xl">✅</div>
+              <div className="flex justify-center">
+                <CheckCircle size={36} color="var(--success)" />
+              </div>
               <p className="font-semibold" style={{color:'var(--text)'}}>Password aggiornata!</p>
               <p className="text-xs" style={{color:'var(--muted)'}}>Verrai reindirizzato al login tra pochi secondi...</p>
             </div>
           )}
+
         </div>
       </div>
     </div>
