@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Timer, BookOpen, LogOut, Menu, Bot, Mic, Coffee } from 'lucide-react'
 import PomodoroTimer from './PomodoroTimer'
-import HowItWorks from './HowItWorks'
 import Flame from './Flame'
 import StreakModal from './StreakModal'
 import FloatingStreak from './FloatingStreak'
+import HowItWorks from './HowItWorks'
 import API from '../services/api'
 
 function calcStreak(sessioni) {
@@ -47,6 +47,7 @@ export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [streak, setStreak] = useState(0)
   const [studiedToday, setStudiedToday] = useState(false)
+  const [streakLoaded, setStreakLoaded] = useState(false)
   const [sessioni, setSessioni] = useState([])
   const [streakOpen, setStreakOpen] = useState(false)
   const [flameRect, setFlameRect] = useState(null)
@@ -74,6 +75,7 @@ export default function Layout({ children, onLogout, user }) {
       const { streak: s, studiedToday: st } = calcStreak(data)
       setStreak(s)
       setStudiedToday(st)
+      setStreakLoaded(true)
     }).catch(() => {})
   }
 
@@ -197,14 +199,16 @@ export default function Layout({ children, onLogout, user }) {
       </div>
 
       {/* How it works — solo in home */}
-      {location.pathname === '/' && <HowItWorks />}
 
       {/* Floating streak widget */}
       <FloatingStreak
         streak={streak}
         studiedToday={studiedToday}
+        loaded={streakLoaded}
         onOpen={(rect) => { setFlameRect(rect); setStreakOpen(true) }}
       />
+
+      {location.pathname === '/' && <HowItWorks />}
 
       {/* Streak modal */}
       {streakOpen && (

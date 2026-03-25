@@ -21,13 +21,13 @@ const tech = [
 export default function HowItWorks() {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(null)
-  const [showBubble, setShowBubble] = useState(true)
+  const [showBubble, setShowBubble] = useState(false)
 
   return (
     <>
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2">
         {showBubble && !open && (
-          <div className="relative flex items-center gap-2 rounded-2xl px-4 py-2.5 shadow-xl animate-bounce"
+          <div className="relative flex items-center gap-2 rounded-2xl px-4 py-2.5 shadow-xl"
             style={{background:'var(--surface)', border:'1px solid var(--border2)'}}
           >
             <span className="text-sm" style={{color:'var(--accent2)'}}>Come funziona?</span>
