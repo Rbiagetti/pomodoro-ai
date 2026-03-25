@@ -180,10 +180,7 @@ export default function Layout({ children, onLogout, user }) {
         </div>
       </div>
 
-      {/* Demo banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 text-center py-1" style={{color:'var(--muted)', opacity:0.4, fontSize:'10px'}}>
-        App demo
-      </div>
+
 
       {/* Content */}
       <div className="pt-16 pb-8 relative z-10">

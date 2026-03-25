@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
+import ResetPassword from './pages/ResetPassword'
 import Timer from './pages/Timer'
 import Pomodoro from './pages/Pomodoro'
 import Sintesi from './pages/Sintesi'
@@ -22,21 +23,26 @@ export default function App() {
   const handleLogin = (data) => setUser(data)
   const handleLogout = () => { localStorage.clear(); setUser(null) }
 
-  if (!user) return <Login onLogin={handleLogin} />
-
   return (
     <BrowserRouter>
       <ErrorBoundary>
-        <Layout onLogout={handleLogout} user={user}>
-          <Routes>
-            <Route path="/" element={<Timer />} />
-            <Route path="/pomodoro" element={<Pomodoro />} />
-            <Route path="/sintesi" element={<Sintesi />} />
-            <Route path="/interrogazione" element={<Interrogazione />} />
-            <Route path="/sessioni" element={<Sessioni />} />
-            <Route path="*" element={<Error message="Pagina non trovata 🍅" />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="*" element={
+            !user
+              ? <Login onLogin={handleLogin} />
+              : <Layout onLogout={handleLogout} user={user}>
+                  <Routes>
+                    <Route path="/" element={<Timer />} />
+                    <Route path="/pomodoro" element={<Pomodoro />} />
+                    <Route path="/sintesi" element={<Sintesi />} />
+                    <Route path="/interrogazione" element={<Interrogazione />} />
+                    <Route path="/sessioni" element={<Sessioni />} />
+                    <Route path="*" element={<Error message="Pagina non trovata 🍅" />} />
+                  </Routes>
+                </Layout>
+          } />
+        </Routes>
       </ErrorBoundary>
     </BrowserRouter>
   )

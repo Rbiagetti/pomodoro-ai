@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { LogIn, UserPlus } from 'lucide-react'
+import { LogIn, UserPlus, Mail } from 'lucide-react'
 import API from '../services/api'
+import { supabase } from '../services/supabase'
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState('')
@@ -8,6 +9,10 @@ export default function Login({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showForgot, setShowForgot] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotSent, setForgotSent] = useState(false)
+  const [forgotLoading, setForgotLoading] = useState(false)
 
   const handleSubmit = async () => {
     setLoading(true); setError('')
@@ -20,6 +25,19 @@ export default function Login({ onLogin }) {
     } catch (e) {
       setError(e.response?.data?.detail || 'Errore di connessione')
     } finally { setLoading(false) }
+  }
+
+  const handleForgot = async () => {
+    setForgotLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      if (error) throw error
+      setForgotSent(true)
+    } catch (e) {
+      setError(e.message || 'Errore invio email')
+    } finally { setForgotLoading(false) }
   }
 
   return (
@@ -40,44 +58,112 @@ export default function Login({ onLogin }) {
           <p style={{color:'var(--muted)', fontSize:'14px'}}>Studia meglio con l'AI socratica</p>
         </div>
 
-        <div className="rounded-2xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          <input
-            type="email" placeholder="Email" value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
-            style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
-          />
-          <input
-            type="password" placeholder="Password" value={password}
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
-            style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
-          />
+        {!showForgot ? (
+          <div className="rounded-2xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+            <input
+              type="email" placeholder="Email" value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
+              style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
+            />
+            <input
+              type="password" placeholder="Password" value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
+              style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
+            />
 
-          {error && (
-            <div className="rounded-2xl px-4 py-3 text-sm" style={{background:'rgba(232,99,58,0.1)', border:'1px solid rgba(232,99,58,0.2)', color:'var(--accent1)'}}>
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="rounded-2xl px-4 py-3 text-sm" style={{background:'rgba(232,99,58,0.1)', border:'1px solid rgba(232,99,58,0.2)', color:'var(--accent1)'}}>
+                {error}
+              </div>
+            )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !email || !password}
-            className="w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all disabled:opacity-30 flex items-center justify-center gap-2"
-            style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)'}}
-          >
-            {loading ? '...' : isRegister ? <><UserPlus size={16} /> Registrati</> : <><LogIn size={16} /> Accedi</>}
-          </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !email || !password}
+              className="w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all disabled:opacity-30 flex items-center justify-center gap-2"
+              style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)'}}
+            >
+              {loading ? '...' : isRegister ? <><UserPlus size={16} /> Registrati</> : <><LogIn size={16} /> Accedi</>}
+            </button>
 
-          <button
-            onClick={() => { setIsRegister(!isRegister); setError('') }}
-            className="w-full py-1 text-xs transition"
-            style={{color:'var(--muted)'}}
-          >
-            {isRegister ? 'Hai già un account? Accedi' : 'Non hai un account? Registrati'}
-          </button>
-        </div>
+            <button
+              onClick={() => { setIsRegister(!isRegister); setError('') }}
+              className="w-full py-1 text-xs transition"
+              style={{color:'var(--muted)'}}
+            >
+              {isRegister ? 'Hai già un account? Accedi' : 'Non hai un account? Registrati'}
+            </button>
+
+            {!isRegister && (
+              <button
+                onClick={() => { setShowForgot(true); setForgotEmail(email); setError('') }}
+                className="w-full py-1 text-xs transition"
+                style={{color:'var(--muted)'}}
+              >
+                Password dimenticata?
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-2xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+            {!forgotSent ? (
+              <>
+                <div className="text-center mb-2">
+                  <p className="font-semibold mb-1" style={{color:'var(--text)'}}>Reset password</p>
+                  <p className="text-xs" style={{color:'var(--muted)'}}>Ti mandiamo un link via email</p>
+                </div>
+                <input
+                  type="email" placeholder="La tua email" value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleForgot()}
+                  className="w-full rounded-2xl px-5 py-4 outline-none transition-all"
+                  style={{background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border)'}}
+                />
+
+                {error && (
+                  <div className="rounded-2xl px-4 py-3 text-sm" style={{background:'rgba(232,99,58,0.1)', border:'1px solid rgba(232,99,58,0.2)', color:'var(--accent1)'}}>
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleForgot}
+                  disabled={forgotLoading || !forgotEmail}
+                  className="w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all disabled:opacity-30 flex items-center justify-center gap-2"
+                  style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)'}}
+                >
+                  {forgotLoading ? '...' : <><Mail size={16} /> Invia link</>}
+                </button>
+
+                <button
+                  onClick={() => { setShowForgot(false); setError('') }}
+                  className="w-full py-1 text-xs transition"
+                  style={{color:'var(--muted)'}}
+                >
+                  ← Torna al login
+                </button>
+              </>
+            ) : (
+              <div className="text-center space-y-4 py-2">
+                <div className="text-4xl">📬</div>
+                <p className="font-semibold" style={{color:'var(--text)'}}>Email inviata!</p>
+                <p className="text-xs" style={{color:'var(--muted)'}}>
+                  Controlla la casella di <span style={{color:'var(--accent2)'}}>{forgotEmail}</span> e clicca il link per reimpostare la password.
+                </p>
+                <button
+                  onClick={() => { setShowForgot(false); setForgotSent(false); setError('') }}
+                  className="w-full py-1 text-xs transition"
+                  style={{color:'var(--muted)'}}
+                >
+                  ← Torna al login
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
