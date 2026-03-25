@@ -200,13 +200,15 @@ export default function Layout({ children, onLogout, user }) {
 
       {/* How it works — solo in home */}
 
-      {/* Floating streak widget */}
-      <FloatingStreak
-        streak={streak}
-        studiedToday={studiedToday}
-        loaded={streakLoaded}
-        onOpen={(rect) => { setFlameRect(rect); setStreakOpen(true) }}
-      />
+      {/* Floating streak widget — nascosta nelle pagine attive */}
+      {!['/pomodoro', '/sintesi', '/interrogazione'].includes(location.pathname) && (
+        <FloatingStreak
+          streak={streak}
+          studiedToday={studiedToday}
+          loaded={streakLoaded}
+          onOpen={(rect) => { setFlameRect(rect); setStreakOpen(true) }}
+        />
+      )}
 
       {location.pathname === '/' && <HowItWorks />}
 
