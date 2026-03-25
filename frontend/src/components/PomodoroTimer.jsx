@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Clock, Pause, Play, Volume2, VolumeX, MessageCircle, Coffee } from 'lucide-react'
 
 // ── Stato globale ─────────────────────────────────────────────────────────────
 let g = {
@@ -81,10 +82,17 @@ export function useTimerState() {
 }
 
 const PHASE_STYLE = {
-  IDLE:            { label: 'Timer',     color: '#9a8878',    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,180,80,0.08)' },
-  POMODORO_ACTIVE: { label: '🍅 Focus',  color: '#ff6b3d',    bg: 'rgba(255,107,61,0.12)', border: 'rgba(255,107,61,0.25)' },
-  CHAT_ACTIVE:     { label: '💬 Chat',   color: '#c4a24a',    bg: 'rgba(196,162,74,0.12)', border: 'rgba(196,162,74,0.25)' },
-  BREAK_ACTIVE:    { label: '☕ Pausa',  color: '#5a9e6f',    bg: 'rgba(90,158,111,0.12)', border: 'rgba(90,158,111,0.25)' },
+  IDLE:            { label: 'Timer',    color: '#9a8878',    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,180,80,0.08)' },
+  POMODORO_ACTIVE: { label: 'Focus',    color: '#ff6b3d',    bg: 'rgba(255,107,61,0.12)', border: 'rgba(255,107,61,0.25)' },
+  CHAT_ACTIVE:     { label: 'Chat',     color: '#c4a24a',    bg: 'rgba(196,162,74,0.12)', border: 'rgba(196,162,74,0.25)' },
+  BREAK_ACTIVE:    { label: 'Pausa',    color: '#5a9e6f',    bg: 'rgba(90,158,111,0.12)', border: 'rgba(90,158,111,0.25)' },
+}
+
+const PHASE_ICON = {
+  IDLE:            Clock,
+  POMODORO_ACTIVE: Clock,
+  CHAT_ACTIVE:     MessageCircle,
+  BREAK_ACTIVE:    Coffee,
 }
 
 export default function PomodoroTimer() {
@@ -115,17 +123,21 @@ export default function PomodoroTimer() {
   const mins = String(Math.floor(state.timeLeft / 60)).padStart(2, '0')
   const secs = String(state.timeLeft % 60).padStart(2, '0')
   const style = PHASE_STYLE[state.phase]
+  const PhaseIcon = PHASE_ICON[state.phase]
 
   const toggleSound = () => { g.soundEnabled = !g.soundEnabled; notify() }
   const togglePause = () => { g.running = !g.running; notify() }
+
+  const SoundIcon = state.soundEnabled ? Volume2 : VolumeX
 
   if (state.phase === 'IDLE') {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
         style={{background: style.bg, borderColor: style.border}}>
-        <span className="text-gray-600 text-xs">⏱️ Pronto</span>
-        <button onClick={toggleSound} className="text-gray-700 hover:text-gray-400 text-xs ml-1 transition">
-          {state.soundEnabled ? '🔊' : '🔇'}
+        <Clock size={14} color={style.color} />
+        <span className="text-xs" style={{color: style.color}}>Pronto</span>
+        <button onClick={toggleSound} className="ml-1 transition opacity-50 hover:opacity-100">
+          <SoundIcon size={12} color={style.color} />
         </button>
       </div>
     )
@@ -135,9 +147,9 @@ export default function PomodoroTimer() {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
         style={{background: style.bg, borderColor: style.border}}>
-        <span className="text-xs font-medium" style={{color: style.color}}>💬</span>
-        <button onClick={toggleSound} className="text-gray-700 hover:text-gray-400 text-xs ml-1 transition">
-          {state.soundEnabled ? '🔊' : '🔇'}
+        <MessageCircle size={14} color={style.color} />
+        <button onClick={toggleSound} className="ml-1 transition opacity-50 hover:opacity-100">
+          <SoundIcon size={12} color={style.color} />
         </button>
       </div>
     )
@@ -146,17 +158,20 @@ export default function PomodoroTimer() {
   return (
     <div className="flex items-center gap-3 px-4 py-2 rounded-xl border backdrop-blur-xl shadow-lg min-w-0"
       style={{background: style.bg, borderColor: style.border}}>
-      <div className="text-right">
-        <div className="text-[10px] font-medium uppercase tracking-wider opacity-70" style={{color: style.color}}>{style.label}</div>
-        <div className="font-mono font-bold text-lg leading-tight tracking-widest" style={{color: style.color}}>{mins}:{secs}</div>
+      <div className="text-center">
+        <div className="flex items-center gap-1 justify-center opacity-70">
+          <PhaseIcon size={10} color={style.color} />
+          <span className="text-[10px] font-medium uppercase tracking-wider" style={{color: style.color}}>{style.label}</span>
+        </div>
+        <div className="font-mono font-bold text-lg leading-tight tracking-widest text-center" style={{color: style.color}}>{mins}:{secs}</div>
       </div>
       <div className="flex gap-1">
-        <button onClick={togglePause} className="w-7 h-7 rounded-lg flex items-center justify-center text-xs transition hover:scale-110 border"
+        <button onClick={togglePause} className="w-7 h-7 rounded-lg flex items-center justify-center transition hover:scale-110 border"
           style={{background: style.bg, borderColor: style.border}}>
-          {state.running ? '⏸' : '▶️'}
+          {state.running ? <Pause size={12} color={style.color} /> : <Play size={12} color={style.color} />}
         </button>
-        <button onClick={toggleSound} className="w-7 h-7 rounded-lg flex items-center justify-center text-xs bg-white/5 border border-white/10 transition hover:scale-110">
-          {state.soundEnabled ? '🔊' : '🔇'}
+        <button onClick={toggleSound} className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 transition hover:scale-110">
+          <SoundIcon size={12} color={style.color} />
         </button>
       </div>
     </div>

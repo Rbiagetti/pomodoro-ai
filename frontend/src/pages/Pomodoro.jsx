@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { SkipForward, X } from 'lucide-react'
 import { useTimerState, enterChat } from '../components/PomodoroTimer'
 
 export default function Pomodoro() {
@@ -54,24 +55,24 @@ export default function Pomodoro() {
           <div style={{fontFamily:"'Space Mono', monospace", fontSize:'52px', fontWeight:'700', letterSpacing:'-2px', color:'var(--text)'}}>
             {mins}<span style={{color:'var(--accent1)', opacity:0.6, margin:'0 2px'}}>:</span>{secs}
           </div>
-          <div className="text-xs mt-3 uppercase tracking-widest" style={{color:'var(--muted)'}}>🍅 pomodoro</div>
+          <div className="text-xs mt-3 uppercase tracking-widest" style={{color:'var(--muted)'}}>pomodoro</div>
         </div>
       </div>
 
       <div className="flex gap-3 w-full max-w-xs">
         <button
           onClick={() => { enterChat(); navigate('/sintesi', { state: { argomento, durata } }) }}
-          className="flex-1 py-3 rounded-2xl text-sm font-medium transition-all"
+          className="flex-1 py-3 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-2"
           style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--text2)'}}
         >
-          ⏭ Salta alla sintesi
+          <SkipForward size={14} /> Salta alla sintesi
         </button>
         <button
           onClick={() => navigate('/')}
-          className="px-5 py-3 rounded-2xl text-sm transition-all"
+          className="px-5 py-3 rounded-2xl text-sm transition-all flex items-center justify-center"
           style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--muted)'}}
         >
-          ✕
+          <X size={16} />
         </button>
       </div>
     </div>

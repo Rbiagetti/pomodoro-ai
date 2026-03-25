@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LogIn, UserPlus } from 'lucide-react'
 import API from '../services/api'
 
 export default function Login({ onLogin }) {
@@ -39,7 +40,7 @@ export default function Login({ onLogin }) {
           <p style={{color:'var(--muted)', fontSize:'14px'}}>Studia meglio con l'AI socratica</p>
         </div>
 
-        <div className="rounded-3xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+        <div className="rounded-2xl p-7 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
           <input
             type="email" placeholder="Email" value={email}
             onChange={e => setEmail(e.target.value)}
@@ -63,10 +64,10 @@ export default function Login({ onLogin }) {
           <button
             onClick={handleSubmit}
             disabled={loading || !email || !password}
-            className="w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all disabled:opacity-30"
+            className="w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all disabled:opacity-30 flex items-center justify-center gap-2"
             style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)'}}
           >
-            {loading ? '...' : isRegister ? '📝 Registrati' : '🔑 Accedi'}
+            {loading ? '...' : isRegister ? <><UserPlus size={16} /> Registrati</> : <><LogIn size={16} /> Accedi</>}
           </button>
 
           <button
@@ -74,7 +75,7 @@ export default function Login({ onLogin }) {
             className="w-full py-1 text-xs transition"
             style={{color:'var(--muted)'}}
           >
-            {isRegister ? 'Hai già un account? Accedi →' : 'Non hai un account? Registrati →'}
+            {isRegister ? 'Hai già un account? Accedi' : 'Non hai un account? Registrati'}
           </button>
         </div>
       </div>

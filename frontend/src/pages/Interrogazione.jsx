@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Mic, MicOff, Send, Volume2, Save, CheckCircle, Square } from 'lucide-react'
 import API, { setRetryCallback } from '../services/api'
 import { endChat } from '../components/PomodoroTimer'
 
@@ -76,22 +77,12 @@ export default function Interrogazione() {
     try {
       window.speechSynthesis?.cancel()
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        }
+        audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
       })
       const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
       const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || 'audio/mp4'
       let recorder
-      try {
-        recorder = new MediaRecorder(stream, { mimeType })
-      } catch(e) {
-        recorder = new MediaRecorder(stream)
-      }
+      try { recorder = new MediaRecorder(stream, { mimeType }) } catch(e) { recorder = new MediaRecorder(stream) }
       const chunks = []
       recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data) }
       recorder.onstop = async () => {
@@ -135,22 +126,24 @@ export default function Interrogazione() {
   return (
     <>
       {/* Header fisso sotto topbar */}
-      <div className="fixed left-0 right-0 z-20 px-4 pt-2 pb-2" style={{top:'56px', background:'var(--bg)'}}>
+      <div className="fixed left-0 right-0 z-20 px-4 pt-2 pb-2" style={{top:'64px', background:'var(--bg)'}}>
         <div className="max-w-md mx-auto rounded-2xl p-3" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          <p className="text-sm text-center font-medium" style={{color:'var(--muted)'}}>{argomento}</p>
+          <p className="text-sm text-center font-bold" style={{color:'var(--muted)'}}>{argomento}</p>
         </div>
       </div>
 
       {/* Chat scrollabile */}
-      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top:'140px', bottom:'150px'}}>
+      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top:'120px', bottom:'150px'}}>
         <div className="max-w-md mx-auto space-y-3">
           {chat.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2`}>
               {msg.role === 'assistant' && (
                 <button onClick={() => speakText(msg.content)}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs transition flex-shrink-0"
-                  style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--muted)'}}
-                >🔊</button>
+                  className="w-7 h-7 rounded-full flex items-center justify-center transition flex-shrink-0"
+                  style={{background:'var(--surface)', border:'1px solid var(--border)'}}
+                >
+                  <Volume2 size={12} color="var(--muted)" />
+                </button>
               )}
               <div className="max-w-xs rounded-2xl px-4 py-3 text-sm"
                 style={msg.role === 'user'
@@ -175,10 +168,10 @@ export default function Interrogazione() {
           {aiSpeaking && (
             <div className="flex justify-center">
               <button onClick={() => window.speechSynthesis?.cancel()}
-                className="text-xs px-3 py-1.5 rounded-full animate-pulse"
+                className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full animate-pulse"
                 style={{color:'var(--accent2)', border:'1px solid rgba(240,148,58,0.3)', background:'rgba(240,148,58,0.1)'}}
               >
-                🔊 AI sta parlando... (clicca per fermare)
+                <Volume2 size={12} /> AI sta parlando... (tap per fermare)
               </button>
             </div>
           )}
@@ -191,8 +184,8 @@ export default function Interrogazione() {
         <div className="max-w-md mx-auto space-y-3">
           {recording && (
             <div className="flex items-center justify-center gap-2 text-sm animate-pulse" style={{color:'var(--accent1)'}}>
-              <span className="w-2 h-2 rounded-full" style={{background:'var(--accent1)'}} />
-              Sto registrando...
+              <div className="w-2 h-2 rounded-full" style={{background:'var(--accent1)'}} />
+              Registrazione in corso...
             </div>
           )}
 
@@ -206,23 +199,27 @@ export default function Interrogazione() {
               style={{background:'var(--surface)', border:'1px solid var(--border)', color:'var(--text)'}}
             />
             <button onClick={recording ? stopRecording : startRecording} disabled={loading}
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-lg transition-all disabled:opacity-30"
+              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all disabled:opacity-30"
               style={recording
                 ? {background:'var(--accent1)', border:'none'}
                 : {background:'var(--surface)', border:'1px solid var(--border)'}
               }
-            >🎙️</button>
+            >
+              {recording ? <Square size={18} color="var(--text)" /> : <Mic size={18} color="var(--muted)" />}
+            </button>
             <button onClick={() => invia()} disabled={loading || !risposta.trim() || recording}
-              className="w-12 h-12 rounded-xl font-bold flex items-center justify-center transition disabled:opacity-30"
-              style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)', border:'none'}}
-            >➤</button>
+              className="w-12 h-12 rounded-xl flex items-center justify-center transition disabled:opacity-30"
+              style={{background:'linear-gradient(135deg, var(--accent1), var(--accent2))', border:'none'}}
+            >
+              <Send size={18} color="var(--text)" />
+            </button>
           </div>
 
           <button onClick={salva} disabled={saving}
-            className="w-full py-3 rounded-xl font-bold text-sm transition disabled:opacity-50"
+            className="w-full py-3 rounded-xl font-bold text-sm transition disabled:opacity-50 flex items-center justify-center gap-2"
             style={{background:'rgba(90,158,111,0.15)', border:'1px solid rgba(90,158,111,0.3)', color:'var(--success)'}}
           >
-            {saving ? '💾 Salvataggio...' : '✅ Termina e salva sessione'}
+            {saving ? <><Save size={14} /> Salvataggio...</> : <><CheckCircle size={14} /> Termina e salva sessione</>}
           </button>
         </div>
       </div>

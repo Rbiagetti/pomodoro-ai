@@ -1,12 +1,11 @@
 import { useState, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Mic, Square, Upload, FileText, CircleDot } from 'lucide-react'
 import API from '../services/api'
 
 function getSupportedMimeType() {
   const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
-  for (const type of types) {
-    if (MediaRecorder.isTypeSupported(type)) return type
-  }
+  for (const type of types) { if (MediaRecorder.isTypeSupported(type)) return type }
   return 'audio/mp4'
 }
 
@@ -39,13 +38,7 @@ export default function Sintesi() {
       setError(null); setAudioBlob(null); setAudioUrl(null)
       chunksRef.current = []
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        }
+        audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
       })
       const mime = getSupportedMimeType()
       const recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : {})
@@ -89,8 +82,9 @@ export default function Sintesi() {
       <div className="w-full max-w-sm">
 
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-2" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>
-            🎙️ Sintesi vocale
+          <h2 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>
+            <Mic size={28} color="var(--accent2)" />
+            Sintesi vocale
           </h2>
           <p style={{color:'var(--muted)', fontSize:'14px'}}>
             Spiega tutto quello che ricordi su <span style={{color:'var(--accent1)'}}>{argomento}</span>
@@ -99,39 +93,45 @@ export default function Sintesi() {
 
         {/* Tab */}
         <div className="flex gap-1 mb-5 p-1 rounded-2xl" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          {['registra', 'carica'].map(t => (
-            <button key={t}
-              onClick={() => { setTab(t); setAudioBlob(null); setAudioUrl(null); setUploadedFile(null) }}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
-              style={tab === t
+          {[
+            { key: 'registra', icon: CircleDot, label: 'Registra' },
+            { key: 'carica', icon: Upload, label: 'Carica file' },
+          ].map(t => (
+            <button key={t.key}
+              onClick={() => { setTab(t.key); setAudioBlob(null); setAudioUrl(null); setUploadedFile(null) }}
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2"
+              style={tab === t.key
                 ? {background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border2)'}
                 : {color:'var(--muted)', border:'1px solid transparent'}
               }
             >
-              {t === 'registra' ? '🔴 Registra' : '📁 Carica file'}
+              <t.icon size={14} />
+              {t.label}
             </button>
           ))}
         </div>
 
-        <div className="rounded-3xl p-6 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+        <div className="rounded-2xl p-6 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
 
           {tab === 'registra' && (
             <>
               <button
                 onClick={recording ? stopRecording : startRecording}
-                className="w-full py-5 rounded-2xl font-bold text-sm transition-all relative overflow-hidden"
+                className="w-full py-5 rounded-2xl font-bold text-sm transition-all relative overflow-hidden flex items-center justify-center gap-2"
                 style={recording
                   ? {background:'var(--surface2)', border:'1px solid var(--border)', color:'var(--text2)'}
                   : {background:'linear-gradient(135deg, var(--accent1), var(--accent2))', color:'var(--text)', border:'none'}
                 }
               >
                 {recording && <span className="absolute inset-0 animate-pulse" style={{background:'rgba(255,107,61,0.08)'}} />}
-                <span className="relative z-10">{recording ? '⏹ Stop registrazione' : '🔴 Inizia a registrare'}</span>
+                <span className="relative z-10 flex items-center gap-2">
+                  {recording ? <><Square size={16} /> Stop registrazione</> : <><Mic size={16} /> Inizia a registrare</>}
+                </span>
               </button>
               {recording && (
                 <div className="flex items-center justify-center gap-2 text-sm animate-pulse" style={{color:'var(--accent1)'}}>
-                  <span className="w-2 h-2 rounded-full" style={{background:'var(--accent1)'}} />
-                  Sto registrando...
+                  <div className="w-2 h-2 rounded-full" style={{background:'var(--accent1)'}} />
+                  Registrazione in corso...
                 </div>
               )}
               {audioUrl && <audio controls src={audioUrl} className="w-full rounded-xl" />}
@@ -145,7 +145,7 @@ export default function Sintesi() {
                 className="w-full py-8 rounded-2xl text-sm flex flex-col items-center gap-2 transition-all"
                 style={{border:'2px dashed var(--border2)', color:'var(--muted)'}}
               >
-                <span className="text-3xl">📁</span>
+                <Upload size={28} />
                 <span>{uploadedFile ? uploadedFile.name : 'Clicca per caricare un file MP3'}</span>
               </button>
               <input ref={fileRef} type="file" accept=".mp3,audio/mpeg" className="hidden" onChange={e => setUploadedFile(e.target.files[0] || null)} />
@@ -162,10 +162,11 @@ export default function Sintesi() {
           <button
             onClick={analizza}
             disabled={!hasAudio || loading}
-            className="w-full py-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-30"
+            className="w-full py-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-30 flex items-center justify-center gap-2"
             style={{background: hasAudio && !loading ? 'linear-gradient(135deg, var(--success), #4a8a5f)' : 'var(--surface2)', color:'var(--text)', border:'none'}}
           >
-            {loading ? '⏳ Analisi in corso...' : '📝 Trascrivi e analizza'}
+            <FileText size={16} />
+            {loading ? 'Analisi in corso...' : 'Trascrivi e analizza'}
           </button>
         </div>
       </div>

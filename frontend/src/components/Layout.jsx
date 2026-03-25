@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Timer, BookOpen, LogOut, Menu, Bot, Mic, Coffee } from 'lucide-react'
 import PomodoroTimer from './PomodoroTimer'
 import HowItWorks from './HowItWorks'
 import Flame from './Flame'
@@ -27,6 +28,12 @@ function calcStreak(sessioni) {
   return streak
 }
 
+const PHASE_PILLS = {
+  '/pomodoro':       { icon: Timer, label: 'Focus', color: '#ff6b3d', bg: 'rgba(255,107,61,0.15)', border: 'rgba(255,107,61,0.3)' },
+  '/sintesi':        { icon: Mic, label: 'Sintesi', color: '#f0943a', bg: 'rgba(240,148,58,0.15)', border: 'rgba(240,148,58,0.3)' },
+  '/interrogazione': { icon: Bot, label: 'Interrogazione', color: '#c4a24a', bg: 'rgba(196,162,74,0.15)', border: 'rgba(196,162,74,0.3)' },
+}
+
 export default function Layout({ children, onLogout, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [streak, setStreak] = useState(0)
@@ -39,8 +46,10 @@ export default function Layout({ children, onLogout, user }) {
   const navigate = useNavigate()
   const location = useLocation()
 
+  const activePill = PHASE_PILLS[location.pathname]
+
   useEffect(() => {
-    if (location.pathname === '/interrogazione') {
+    if (activePill) {
       const t = setTimeout(() => setPillVisible(true), 50)
       return () => clearTimeout(t)
     } else {
@@ -57,8 +66,8 @@ export default function Layout({ children, onLogout, user }) {
   }, [user])
 
   const navItems = [
-    { icon: '🍅', label: 'Studia', path: '/' },
-    { icon: '📚', label: 'Sessioni', path: '/sessioni' },
+    { icon: Timer, label: 'Studia', path: '/' },
+    { icon: BookOpen, label: 'Sessioni', path: '/sessioni' },
   ]
 
   return (
@@ -92,20 +101,23 @@ export default function Layout({ children, onLogout, user }) {
 
           {/* Nav */}
           <nav className="flex-1 space-y-1">
-            {navItems.map(item => (
-              <button
-                key={item.path}
-                onClick={() => { navigate(item.path); setSidebarOpen(false) }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200"
-                style={location.pathname === item.path
-                  ? {background:'rgba(232,99,58,0.15)', color:'var(--accent1)', border:'1px solid rgba(232,99,58,0.2)'}
-                  : {color:'var(--muted)', border:'1px solid transparent'}
-                }
-              >
-                <span className="text-lg">{item.icon}</span>
-                {item.label}
-              </button>
-            ))}
+            {navItems.map(item => {
+              const Icon = item.icon
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => { navigate(item.path); setSidebarOpen(false) }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200"
+                  style={location.pathname === item.path
+                    ? {background:'rgba(232,99,58,0.15)', color:'var(--accent1)', border:'1px solid rgba(232,99,58,0.2)'}
+                    : {color:'var(--muted)', border:'1px solid transparent'}
+                  }
+                >
+                  <Icon size={18} />
+                  {item.label}
+                </button>
+              )
+            })}
           </nav>
 
           {/* Logout */}
@@ -114,40 +126,36 @@ export default function Layout({ children, onLogout, user }) {
             className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm transition-all duration-200 w-full"
             style={{color:'var(--muted)', border:'1px solid transparent'}}
           >
-            <span className="text-lg">🚪</span>
+            <LogOut size={18} />
             Logout
           </button>
         </div>
       </div>
 
       {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3" style={{background:'rgba(12,10,8,0.85)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,180,80,0.06)'}}>
+      <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3" style={{background:'rgba(12,10,8,0.6)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,180,80,0.06)'}}>
         <button
           onClick={() => setSidebarOpen(true)}
           className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200 flex-shrink-0"
           style={{background:'rgba(255,255,255,0.04)', border:'1px solid var(--border)'}}
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect y="2" width="18" height="1.5" rx="1" fill="var(--text2)"/>
-            <rect y="8.25" width="18" height="1.5" rx="1" fill="var(--text2)"/>
-            <rect y="14.5" width="18" height="1.5" rx="1" fill="var(--text2)"/>
-          </svg>
+          <Menu size={18} color="var(--text2)" />
         </button>
 
-        {/* Pillola centrata */}
-        {location.pathname === '/interrogazione' && (
+        {/* Pillola fase centrata */}
+        {activePill && (
           <div
             className="absolute left-1/2 flex items-center gap-2 px-4 py-1.5 rounded-full"
             style={{
               transform: pillVisible ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0.3)',
               opacity: pillVisible ? 1 : 0,
               transition: 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease',
-              background: 'rgba(255,107,61,0.15)',
-              border: '1px solid rgba(255,107,61,0.3)',
+              background: activePill.bg,
+              border: `1px solid ${activePill.border}`,
             }}
           >
-            <span style={{fontSize:'14px'}}>🤖</span>
-            <span className="text-sm font-bold" style={{color:'var(--accent1)', fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>Interrogazione AI</span>
+            <activePill.icon size={14} color={activePill.color} />
+            <span className="text-sm font-bold" style={{color: activePill.color, fontFamily:"'Oswald', sans-serif", letterSpacing:'0.5px'}}>{activePill.label}</span>
           </div>
         )}
 
@@ -174,7 +182,7 @@ export default function Layout({ children, onLogout, user }) {
 
       {/* Demo banner */}
       <div className="fixed bottom-0 left-0 right-0 z-30 text-center py-1" style={{color:'var(--muted)', opacity:0.4, fontSize:'10px'}}>
-        App demo · tempi più lunghi in momenti di alto traffico
+        App demo
       </div>
 
       {/* Content */}
