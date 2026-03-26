@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Clock, Pause, Play, Volume2, VolumeX, MessageCircle, Coffee } from 'lucide-react'
 
 // ── Stato globale ─────────────────────────────────────────────────────────────
@@ -96,6 +97,7 @@ const PHASE_ICON = {
 }
 
 export default function PomodoroTimer({ hideCountdown = false }) {
+  const navigate = useNavigate()
   const state = useTimerState()
   const intervalRef = useRef(null)
 
@@ -125,16 +127,19 @@ export default function PomodoroTimer({ hideCountdown = false }) {
   const style = PHASE_STYLE[state.phase]
   const PhaseIcon = PHASE_ICON[state.phase]
 
-  const toggleSound = () => { g.soundEnabled = !g.soundEnabled; notify() }
-  const togglePause = () => { g.running = !g.running; notify() }
+  const toggleSound = (e) => { e.stopPropagation(); g.soundEnabled = !g.soundEnabled; notify() }
+  const togglePause = (e) => { e.stopPropagation(); g.running = !g.running; notify() }
 
   const SoundIcon = state.soundEnabled ? Volume2 : VolumeX
 
+  // IDLE
   if (state.phase === 'IDLE') {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
         style={{background: style.bg, borderColor: style.border}}>
-        {!hideCountdown && <><Clock size={14} color={style.color} /><span className="text-xs" style={{color: style.color}}>Pronto</span></>}
+        {!hideCountdown && (
+          <><Clock size={14} color={style.color} /><span className="text-xs" style={{color: style.color}}>Pronto</span></>
+        )}
         <button onClick={toggleSound} className={hideCountdown ? '' : 'ml-1'} style={{opacity:0.5}}>
           <SoundIcon size={hideCountdown ? 16 : 12} color={style.color} />
         </button>
@@ -142,6 +147,7 @@ export default function PomodoroTimer({ hideCountdown = false }) {
     )
   }
 
+  // CHAT_ACTIVE
   if (state.phase === 'CHAT_ACTIVE') {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-sm min-w-0"
@@ -154,9 +160,19 @@ export default function PomodoroTimer({ hideCountdown = false }) {
     )
   }
 
+  // POMODORO_ACTIVE / BREAK_ACTIVE
+  // hideCountdown=true  → su /pomodoro: solo pause+volume, nessuna navigazione
+  // hideCountdown=false → su altre pagine: countdown cliccabile per tornare a /pomodoro
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-xl shadow-lg min-w-0"
-      style={{background: style.bg, borderColor: style.border}}>
+    <div
+      className="flex items-center gap-2 px-3 py-2 rounded-xl border backdrop-blur-xl shadow-lg min-w-0"
+      style={{
+        background: style.bg,
+        borderColor: style.border,
+        cursor: hideCountdown ? 'default' : 'pointer',
+      }}
+      onClick={!hideCountdown && state.phase === 'POMODORO_ACTIVE' ? () => navigate('/pomodoro') : undefined}
+    >
       {!hideCountdown && (
         <div className="text-center">
           <div className="flex items-center gap-1 justify-center opacity-70">
@@ -167,11 +183,20 @@ export default function PomodoroTimer({ hideCountdown = false }) {
         </div>
       )}
       <div className="flex gap-1">
-        <button onClick={togglePause} className="w-7 h-7 rounded-lg flex items-center justify-center transition hover:scale-110 border"
-          style={{background: style.bg, borderColor: style.border}}>
-          {state.running ? <Pause size={hideCountdown ? 16 : 12} color={style.color} /> : <Play size={hideCountdown ? 16 : 12} color={style.color} />}
+        <button
+          onClick={togglePause}
+          className="w-7 h-7 rounded-lg flex items-center justify-center transition hover:scale-110 border"
+          style={{background: style.bg, borderColor: style.border}}
+        >
+          {state.running
+            ? <Pause size={hideCountdown ? 16 : 12} color={style.color} />
+            : <Play size={hideCountdown ? 16 : 12} color={style.color} />
+          }
         </button>
-        <button onClick={toggleSound} className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 transition hover:scale-110">
+        <button
+          onClick={toggleSound}
+          className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 transition hover:scale-110"
+        >
           <SoundIcon size={hideCountdown ? 16 : 12} color={style.color} />
         </button>
       </div>

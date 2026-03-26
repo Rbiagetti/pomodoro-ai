@@ -134,7 +134,7 @@ export default function Interrogazione() {
       </div>
 
       {/* Chat scrollabile */}
-      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top:'120px', bottom:'150px'}}>
+      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top:'136px', bottom:'150px'}}>
         <div className="max-w-md mx-auto space-y-3">
           {chat.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2`}>
