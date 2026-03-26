@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
 import ResetPassword from './pages/ResetPassword'
+import OnboardingModal from './components/OnboardingModal'
 import Timer from './pages/Timer'
 import Pomodoro from './pages/Pomodoro'
 import Sintesi from './pages/Sintesi'
@@ -20,11 +21,19 @@ export default function App() {
     if (token && email) setUser({ email })
   }, [])
 
-  const handleLogin = (data) => setUser(data)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  const handleLogin = (data) => {
+    setUser(data)
+    if (!localStorage.getItem('pomodoro_onboarded')) {
+      setShowOnboarding(true)
+    }
+  }
   const handleLogout = () => { localStorage.clear(); setUser(null) }
 
   return (
-    <BrowserRouter>
+    <>
+      <BrowserRouter>
       <ErrorBoundary>
         <Routes>
           <Route path="/reset-password" element={<ResetPassword />} />
@@ -44,6 +53,8 @@ export default function App() {
           } />
         </Routes>
       </ErrorBoundary>
-    </BrowserRouter>
+      </BrowserRouter>
+    {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
+    </>
   )
 }
