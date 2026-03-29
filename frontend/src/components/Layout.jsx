@@ -155,8 +155,8 @@ export default function Layout({ children, onLogout, user, isGuest }) {
       {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-30 flex items-center px-4 py-3 gap-2" style={{background:'rgba(12,10,8,0.6)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,180,80,0.06)'}}>
 
-        {/* Sinistra — hamburger */}
-        <div className="flex-shrink-0">
+        {/* Sinistra — hamburger + badge trial */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
             className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200"
@@ -164,6 +164,11 @@ export default function Layout({ children, onLogout, user, isGuest }) {
           >
             <Menu size={18} color="var(--text2)" />
           </button>
+          {isGuest && (
+            <span className="px-2 py-1 rounded-lg text-xs font-bold tracking-wider" style={{background:'rgba(196,162,74,0.12)', border:'1px solid rgba(196,162,74,0.25)', color:'var(--accent3)'}}>
+              TRIAL
+            </span>
+          )}
         </div>
 
         {/* Centro — pillola fase */}
@@ -194,15 +199,10 @@ export default function Layout({ children, onLogout, user, isGuest }) {
 
 
       {/* Banner guest */}
-      {isGuest && (
-        <div className="fixed left-0 right-0 z-20 flex items-center justify-center gap-2 py-2.5" style={{top:'56px', background:'rgba(12,10,8,0.5)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', borderBottom:'1px solid rgba(196,162,74,0.12)', marginTop:'2px'}}>
-          <span className="px-2.5 py-1 rounded-lg text-xs font-bold tracking-wider" style={{background:'rgba(196,162,74,0.15)', border:'1px solid rgba(196,162,74,0.3)', color:'var(--accent3)'}}>TRIAL</span>
-          <span className="text-xs" style={{color:'var(--muted)'}}>Nessun salvataggio sessioni</span>
-        </div>
-      )}
+
 
       {/* Content */}
-      <div className={isGuest ? "pt-24 pb-8 relative z-10" : "pt-16 pb-8 relative z-10"}>
+      <div className="pt-16 pb-8 relative z-10">
         {children}
       </div>
 

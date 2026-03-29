@@ -6,6 +6,8 @@ import { endChat } from '../components/PomodoroTimer'
 import GuestConversionModal from '../components/GuestConversionModal'
 
 export default function Interrogazione({ isGuest }) {
+  const headerTop = '64px'
+  const chatTop = '120px'
   const { state } = useLocation()
   const navigate = useNavigate()
   const { argomento, durata, trascrizione, analisi } = state || {}
@@ -143,14 +145,14 @@ export default function Interrogazione({ isGuest }) {
   return (
     <>
       {/* Header fisso sotto topbar */}
-      <div className="fixed left-0 right-0 z-20 px-4 pt-2 pb-2" style={{top:'64px', background:'var(--bg)'}}>
-        <div className="max-w-md mx-auto rounded-2xl p-3" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          <p className="text-sm text-center font-bold" style={{color:'var(--muted)'}}>{argomento}</p>
+      <div className="fixed left-0 right-0 z-20 px-4 pt-2 pb-2" style={{top: headerTop, background:'var(--bg)'}}>
+        <div className="max-w-md mx-auto rounded-2xl px-4 py-2.5" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <p className="text-sm text-center font-bold" style={{color:'var(--text)'}}>{argomento}</p>
         </div>
       </div>
 
       {/* Chat scrollabile */}
-      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top:'136px', bottom:'150px'}}>
+      <div className="fixed left-0 right-0 overflow-y-auto px-4" style={{top: chatTop, bottom:'150px'}}>
         <div className="max-w-md mx-auto space-y-3">
           {chat.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2`}>

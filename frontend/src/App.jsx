@@ -27,6 +27,11 @@ export default function App() {
   const handleGuestLogin = () => {
     setIsGuest(true)
     setUser({ email: 'ospite', guest: true })
+    // JWT fake per chiamate API — backend non verifica firma
+    const header = btoa(JSON.stringify({alg:'HS256',typ:'JWT'}))
+    const payload = btoa(JSON.stringify({sub:'guest-'+Date.now(), email:'guest@local'}))
+    const fakeToken = header + '.' + payload + '.fakesig'
+    localStorage.setItem('token', fakeToken)
   }
 
   const handleLogin = (data) => {
