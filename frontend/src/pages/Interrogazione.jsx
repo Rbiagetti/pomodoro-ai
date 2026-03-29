@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Mic, MicOff, Send, Volume2, Save, CheckCircle, Square } from 'lucide-react'
 import API, { setRetryCallback } from '../services/api'
 import { endChat } from '../components/PomodoroTimer'
+import GuestConversionModal from '../components/GuestConversionModal'
 
-export default function Interrogazione() {
+export default function Interrogazione({ isGuest }) {
   const { state } = useLocation()
   const navigate = useNavigate()
   const { argomento, durata, trascrizione, analisi } = state || {}
@@ -16,6 +17,7 @@ export default function Interrogazione() {
   const [loading, setLoading] = useState(false)
   const [retryMsg, setRetryMsg] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [guestModal, setGuestModal] = useState(null)
   const [recording, setRecording] = useState(false)
   const [aiSpeaking, setAiSpeaking] = useState(false)
   const mediaRef = useRef(null)
@@ -108,20 +110,34 @@ export default function Interrogazione() {
     setRecording(false)
   }
 
+  const sessionData = {
+    argomento, trascrizione, analisi,
+    n_domande: chat.filter(m => m.role === 'assistant').length,
+    durata_minuti: Number(durata) || 25,
+    chat_history: chat,
+  }
+
   const salva = async () => {
+    if (isGuest) {
+      setGuestModal(sessionData)
+      return
+    }
     setSaving(true)
     try {
-      await API.post('/sessions', {
-        argomento, trascrizione, analisi,
-        n_domande: chat.filter(m => m.role === 'assistant').length,
-        durata_minuti: Number(durata) || 25,
-        chat_history: chat,
-      })
+      await API.post('/sessions', sessionData)
       sessionStorage.removeItem('chat_history')
       window.dispatchEvent(new Event('session-saved'))
       endChat(); navigate('/')
     } catch (e) { alert('Errore: ' + (e.response?.data?.detail || e.message)) }
     finally { setSaving(false) }
+  }
+
+  const handleGuestConverted = (userData) => {
+    sessionStorage.removeItem('chat_history')
+    window.dispatchEvent(new Event('session-saved'))
+    endChat()
+    // Ricarica come utente registrato
+    window.location.href = '/'
   }
 
   return (
@@ -224,6 +240,13 @@ export default function Interrogazione() {
           </button>
         </div>
       </div>
+      {guestModal && (
+        <GuestConversionModal
+          sessionData={guestModal}
+          onClose={() => { setGuestModal(null); endChat(); navigate('/') }}
+          onConverted={handleGuestConverted}
+        />
+      )}
     </>
   )
 }

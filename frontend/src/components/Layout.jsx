@@ -43,7 +43,7 @@ const PHASE_PILLS = {
   '/sessioni':       { icon: BookOpen, label: 'Sessioni', color: '#7a9e8a', bg: 'rgba(122,158,138,0.15)', border: 'rgba(122,158,138,0.3)' },
 }
 
-export default function Layout({ children, onLogout, user }) {
+export default function Layout({ children, onLogout, user, isGuest }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [streak, setStreak] = useState(0)
   const [studiedToday, setStudiedToday] = useState(false)
@@ -87,7 +87,7 @@ export default function Layout({ children, onLogout, user }) {
 
   const navItems = [
     { icon: Timer, label: 'Studia', path: '/' },
-    { icon: BookOpen, label: 'Sessioni', path: '/sessioni' },
+    ...(!isGuest ? [{ icon: BookOpen, label: 'Sessioni', path: '/sessioni' }] : []),
   ]
 
   return (
@@ -193,8 +193,16 @@ export default function Layout({ children, onLogout, user }) {
 
 
 
+      {/* Banner guest */}
+      {isGuest && (
+        <div className="fixed left-0 right-0 z-20 flex items-center justify-center gap-2 py-2.5" style={{top:'56px', background:'rgba(12,10,8,0.5)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', borderBottom:'1px solid rgba(196,162,74,0.12)', marginTop:'2px'}}>
+          <span className="px-2.5 py-1 rounded-lg text-xs font-bold tracking-wider" style={{background:'rgba(196,162,74,0.15)', border:'1px solid rgba(196,162,74,0.3)', color:'var(--accent3)'}}>TRIAL</span>
+          <span className="text-xs" style={{color:'var(--muted)'}}>Nessun salvataggio sessioni</span>
+        </div>
+      )}
+
       {/* Content */}
-      <div className="pt-16 pb-8 relative z-10">
+      <div className={isGuest ? "pt-24 pb-8 relative z-10" : "pt-16 pb-8 relative z-10"}>
         {children}
       </div>
 

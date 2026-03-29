@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 
 export default function App() {
   const [user, setUser] = useState(null)
+  const [isGuest, setIsGuest] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -23,13 +24,19 @@ export default function App() {
 
   const [showOnboarding, setShowOnboarding] = useState(false)
 
+  const handleGuestLogin = () => {
+    setIsGuest(true)
+    setUser({ email: 'ospite', guest: true })
+  }
+
   const handleLogin = (data) => {
+    setIsGuest(false)
     setUser(data)
     if (!localStorage.getItem('pomodoro_onboarded')) {
       setShowOnboarding(true)
     }
   }
-  const handleLogout = () => { localStorage.clear(); setUser(null) }
+  const handleLogout = () => { localStorage.clear(); sessionStorage.clear(); setUser(null); setIsGuest(false) }
 
   return (
     <>
@@ -39,13 +46,13 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={
             !user
-              ? <Login onLogin={handleLogin} />
-              : <Layout onLogout={handleLogout} user={user}>
+              ? <Login onLogin={handleLogin} onGuestLogin={handleGuestLogin} />
+              : <Layout onLogout={handleLogout} user={user} isGuest={isGuest}>
                   <Routes>
                     <Route path="/" element={<Timer />} />
                     <Route path="/pomodoro" element={<Pomodoro />} />
                     <Route path="/sintesi" element={<Sintesi />} />
-                    <Route path="/interrogazione" element={<Interrogazione />} />
+                    <Route path="/interrogazione" element={<Interrogazione isGuest={isGuest} />} />
                     <Route path="/sessioni" element={<Sessioni />} />
                     <Route path="*" element={<Error message="Pagina non trovata 🍅" />} />
                   </Routes>
