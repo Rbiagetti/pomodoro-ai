@@ -87,25 +87,7 @@ export default function Sintesi() {
           <h2 className="text-2xl font-bold" style={{color:'var(--text)', fontFamily:"'Oswald', sans-serif"}}>{argomento}</h2>
         </div>
 
-        {/* Tab */}
-        <div className="flex gap-1 mb-5 p-1 rounded-2xl" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
-          {[
-            { key: 'registra', icon: CircleDot, label: 'Registra' },
-            { key: 'carica', icon: Upload, label: 'Carica file' },
-          ].map(t => (
-            <button key={t.key}
-              onClick={() => { setTab(t.key); setAudioBlob(null); setAudioUrl(null); setUploadedFile(null) }}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2"
-              style={tab === t.key
-                ? {background:'var(--surface2)', color:'var(--text)', border:'1px solid var(--border2)'}
-                : {color:'var(--muted)', border:'1px solid transparent'}
-              }
-            >
-              <t.icon size={14} />
-              {t.label}
-            </button>
-          ))}
-        </div>
+
 
         <div className="rounded-2xl p-6 space-y-4" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
 
@@ -131,6 +113,15 @@ export default function Sintesi() {
                 </div>
               )}
               {audioUrl && <audio controls src={audioUrl} className="w-full rounded-xl" />}
+              {!audioUrl && !recording && (
+                <button
+                  onClick={() => { setTab('carica'); setAudioBlob(null); setAudioUrl(null) }}
+                  className="w-full py-2.5 rounded-xl text-xs text-center transition flex items-center justify-center gap-1.5"
+                  style={{color:'var(--muted)', border:'1px solid var(--border)', background:'rgba(255,255,255,0.02)'}}
+                >
+                  <Upload size={12} /> Carica file MP3
+                </button>
+              )}
             </>
           )}
 
@@ -146,6 +137,13 @@ export default function Sintesi() {
               </button>
               <input ref={fileRef} type="file" accept=".mp3,audio/mpeg" className="hidden" onChange={e => setUploadedFile(e.target.files[0] || null)} />
               {uploadedFile && <audio controls src={URL.createObjectURL(uploadedFile)} className="w-full rounded-xl" />}
+              <button
+                onClick={() => { setTab('registra'); setUploadedFile(null) }}
+                className="w-full py-2.5 rounded-xl text-xs text-center transition flex items-center justify-center gap-1.5"
+                style={{color:'var(--muted)', border:'1px solid var(--border)', background:'rgba(255,255,255,0.02)'}}
+              >
+                <Mic size={12} /> Usa microfono invece
+              </button>
             </>
           )}
 
